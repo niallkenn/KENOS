@@ -1,29 +1,45 @@
 [org 0x7c00]
 
-mov ah, 0xe
-mov bx, string
+mov bx, buffer
+jmp loop                            ; start program at loop
 
-printString:                        ; loop through string and print each char,
-    mov al, [bx]                    ; until last char is terminator
-    cmp al, 0
-    je next
+start_cycle:                        ; type-print loop
+    mov ah, 0xe                     ; print new line after last print
+    mov al, 10                  
     int 0x10
-    inc bx
-    jmp printString
-
-next:
+    mov al, 13
+    int 0x10
+    mov bx, buffer
+loop:                               ; fill buffer with typed string
     mov ah, 0
     int 0x16
+    mov [bx], al
     mov ah, 0xe
     int 0x10
-    jmp next
+    inc bx
+    cmp bx, buffer + 19
+    ja printBuffer                  ; print buffer when its 20 char long
+    jmp loop
 
-string:
-    db "Hello world!", 10, 13, 0
+printBuffer:                    
+    mov ah, 0xe                     ; print new line after typing
+    mov al, 10
+    int 0x10
+    mov al, 13
+    int 0x10
+    mov bx, buffer
+printLoop:                          ; print string
+    mov al, [bx]
+    cmp al, 0
+    je start_cycle
+    int 0x10
+    inc bx
+    jmp printLoop
 
-char:
-    db 0
+buffer:                             ; initialise buffer to 0
+    times 21 db 0
 
-jmp $                           ; jump to current instruction (idk why or what this does)
-times 510-($-$$) db 0           ; fill sector
-db 0x55, 0xaa                   ; add bootloader signature
+end:
+    jmp $                           ; jump to current instruction (idk why or what this does)
+    times 510-($-$$) db 0           ; fill sector
+    db 0x55, 0xaa                   ; add bootloader signature
