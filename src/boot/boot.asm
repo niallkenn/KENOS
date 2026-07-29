@@ -1,7 +1,24 @@
 [org 0x7c00]
 
+mov bp, 0x8000                      ; initialise stack at 8000h
+mov sp, bp
+
 mov bx, buffer
 jmp loop                            ; start program at loop
+
+print_bx:                           ; prints bx
+    pusha
+    mov ah, 0xe
+    mov al, 'b'
+    int 0x10
+    mov al, 'x'
+    int 0x10
+    mov al, 10
+    int 0x10
+    mov al, 13
+    int 0x10
+    popa
+    ret
 
 start_cycle:                        ; type-print loop
     mov ah, 0xe                     ; print new line after last print
@@ -13,6 +30,10 @@ start_cycle:                        ; type-print loop
 loop:                               ; fill buffer with typed string
     mov ah, 0
     int 0x16
+    cmp ah, 0xe
+    jne call_print_bx
+    call print_bx
+call_print_bx:
     mov [bx], al
     mov ah, 0xe
     int 0x10
