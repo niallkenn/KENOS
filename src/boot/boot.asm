@@ -1,13 +1,18 @@
-mov ah, 0xe                         ; print first character, a
-mov al, 'a'
-int 0x10                            
+[org 0x7c00]
 
-print:                              ; prints alphabet using loop,
-    inc al                          ; the loop increment the character until
-    cmp al, 'z' + 1                 ; it is past z, then exits
+string:
+    db "Hello world!", 0
+
+mov ah, 0xe
+mov bx, string
+
+printString:                        ; loop through string and print each char,
+    mov al, [bx]                    ; until last char is terminator
+    cmp al, 0
     je end
     int 0x10
-    jmp print
+    inc bx
+    jmp printString
 
 end:
     jmp $                           ; jump to current instruction (idk why or what this does)
