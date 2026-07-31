@@ -68,6 +68,45 @@ handle_disk_error:
     call print_string_16
     jmp $                       ; stop program after disk error
 
+GDT_START:
+    null_descriptor:
+        dd 0
+        dd 0
+    code_descriptor:
+        dw 0xffff               ; first 16 bits of the limit
+        dw 0
+        db 0                    ; first 24 / 32 bits of the base
+        db 10011010             ; present, privilege, type and type flags
+        db 11001111             ; other flags and last 4 bits of limit
+        db 0                    ; last 8 bits of the base
+    data_descriptor:
+        dw 0xffff               ; first 16 bits of the limit
+        dw 0
+        db 0                    ; first 24 / 32 bits of the base
+        db 10010010             ; present, privilege, type and type flags
+        db 11001111             ; other flags and last 4 bits of limit
+        db 0                    ; last 8 bits of the base
+GDT_END:
+
+gdt_descriptor:
+    dw GDT_END - GDT_START - 1
+    dd GDT_START
+
+CODE_SEGMENT equ code_descriptor - GDT_START
+DATA_SEGMENT equ data_descriptor - GDT_START
+
+cli
+lgdt [gdt_descriptor]
+mov eax, cr0
+or eax, 1
+mov cr0, eax
+
+jmp CODE_SEGMENT:.start_protected_mode
+
+[bits 32]
+.start_protected_mode:
+    
+
 BOOT_DRIVE_NUMBER: db 0
 REAL_MODE_MSG: db "Started in 16-bit real mode...", 13, 10, 0
 LOAD_KERNEL_MSG: db "Loading kernel into RAM at 0x1000...", 13, 10, 0
