@@ -59,7 +59,7 @@ load_kernel:
     jc handle_disk_error    
     cmp al, 15
 
-    je handle_disk_error
+    jne handle_disk_error
 
     ret
 
@@ -86,15 +86,15 @@ GDT_START:
         dw 0xffff               ; first 16 bits of the limit
         dw 0
         db 0                    ; first 24 / 32 bits of the base
-        db 10011010             ; present, privilege, type and type flags
-        db 11001111             ; other flags and last 4 bits of limit
+        db 10011010b             ; present, privilege, type and type flags
+        db 11001111b             ; other flags and last 4 bits of limit
         db 0                    ; last 8 bits of the base
     data_descriptor:
         dw 0xffff               ; first 16 bits of the limit
         dw 0
         db 0                    ; first 24 / 32 bits of the base
-        db 10010010             ; present, privilege, type and type flags
-        db 11001111             ; other flags and last 4 bits of limit
+        db 10010010b             ; present, privilege, type and type flags
+        db 11001111b             ; other flags and last 4 bits of limit
         db 0                    ; last 8 bits of the base
 GDT_END:
 
@@ -108,9 +108,17 @@ DATA_SEGMENT equ data_descriptor - GDT_START
 
 [bits 32]
 start_protected_mode:
-    mov al, 'a'
+    mov edi, 0xb8000
+    mov al, ' '
     mov ah, 0xf0
     mov [0xb8000], ax
+    mov ecx, 2000
+
+    .loopclear:
+        mov [edi], ax
+        add edi, 2
+        loop .loopclear
+
 
 BOOT_DRIVE_NUMBER: db 0
 REAL_MODE_MSG: db "Started in 16-bit real mode...", 13, 10, 0
