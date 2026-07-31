@@ -71,6 +71,10 @@ handle_disk_error:
     jmp $                       ; stop program after disk error
 
 switch_pm:
+    mov ah, 0x0
+    mov al, 0x3
+    int 0x10
+    
     cli
     lgdt [gdt_descriptor]
 
@@ -110,17 +114,17 @@ DATA_SEGMENT equ data_descriptor - GDT_START
 
 [bits 32]
 start_protected_mode:
-    mov edi, 0xb8000
-    mov al, ' '
-    mov ah, 0xf0
-    mov [0xb8000], ax
-    mov ecx, 2000
+    mov ax, DATA_SEGMENT
+    mov ds, ax
+    mov ss, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
 
-    .loopclear:
-        mov [edi], ax
-        add edi, 2
-        loop .loopclear
+    mov ebp, 0x90000
+    mov esp, ebp
 
+    jmp KERNEL_OFFSET
 
 BOOT_DRIVE_NUMBER: db 0
 REAL_MODE_MSG: db "Started in 16-bit real mode...", 13, 10, 0
