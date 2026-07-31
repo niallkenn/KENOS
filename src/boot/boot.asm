@@ -24,6 +24,9 @@ KERNEL_OFFSET equ 0x1000        ; kernel entry start point
     call print_string_16
 
     call load_kernel
+    mov si, KERNEL_SUCCESS_MSG
+    call print_string_16
+
     call switch_pm
     jmp $                       ; keep jmp here (do not excecute functions past here)
 
@@ -58,7 +61,6 @@ load_kernel:
     ; handle disk read errors
     jc handle_disk_error    
     cmp al, 15
-
     jne handle_disk_error
 
     ret
@@ -124,6 +126,7 @@ BOOT_DRIVE_NUMBER: db 0
 REAL_MODE_MSG: db "Started in 16-bit real mode...", 13, 10, 0
 LOAD_KERNEL_MSG: db "Loading kernel into RAM at 0x1000...", 13, 10, 0
 DISK_ERROR_MSG: db "Disk read failed!", 13, 10, 0
+KERNEL_SUCCESS_MSG: db "Kernel loaded successfully!", 13, 10, 0
 
 times 510-($-$$) db 0           ; fill sector
 db 0x55, 0xaa                   ; add bootloader signature
