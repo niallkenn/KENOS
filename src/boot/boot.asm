@@ -24,7 +24,7 @@ KERNEL_OFFSET equ 0x1000        ; kernel entry start point
     call print_string_16
 
     call load_kernel
-
+    call switch_pm
     jmp $                       ; keep jmp here (do not excecute functions past here)
 
 print_string_16:
@@ -61,12 +61,22 @@ load_kernel:
 
     je handle_disk_error
 
-    jmp $
+    ret
 
 handle_disk_error:
     mov si, DISK_ERROR_MSG
     call print_string_16
     jmp $                       ; stop program after disk error
+
+switch_pm:
+    cli
+    lgdt [gdt_descriptor]
+
+    mov eax, cr0
+    or eax, 1
+    mov cr0, eax
+
+    jmp CODE_SEGMENT:start_protected_mode
 
 GDT_START:
     null_descriptor:
@@ -95,17 +105,12 @@ gdt_descriptor:
 CODE_SEGMENT equ code_descriptor - GDT_START
 DATA_SEGMENT equ data_descriptor - GDT_START
 
-cli
-lgdt [gdt_descriptor]
-mov eax, cr0
-or eax, 1
-mov cr0, eax
-
-jmp CODE_SEGMENT:.start_protected_mode
 
 [bits 32]
-.start_protected_mode:
-    
+start_protected_mode:
+    mov al, 'a'
+    mov ah, 0xf0
+    mov [0xb8000], ax
 
 BOOT_DRIVE_NUMBER: db 0
 REAL_MODE_MSG: db "Started in 16-bit real mode...", 13, 10, 0
