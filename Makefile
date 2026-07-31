@@ -36,7 +36,7 @@ $(KERNEL_OBJ): $(KERNEL_SRC) | $(BUILD_DIR)
 	@g++ $(CXXFLAGS) -c $(KERNEL_SRC) -o $(KERNEL_OBJ)
 
 run: $(OS_IMAGE)
-	qemu-system-i386 -fda $(OS_IMAGE)
+	@qemu-system-i386 -fda $(OS_IMAGE)
 
 clean:
 	rm -rf $(BUILD_DIR)
