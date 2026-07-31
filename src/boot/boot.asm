@@ -5,6 +5,7 @@ KERNEL_OFFSET equ 0x1000        ; kernel entry start point
 
 .bootloader_start:
     mov [BOOT_DRIVE_NUMBER], dl ; save boot drive number passed to dl by bios
+
     cli                         ; disable interrupts for setup
 
     ; ensure registers for tiny memory model
@@ -19,35 +20,14 @@ KERNEL_OFFSET equ 0x1000        ; kernel entry start point
 
     sti                         ; re-enable interrupts
 
-
-    mov si, REAL_MODE_MSG
-    call print_string_16
+    mov ax, 0x0013
+    int 0x10
 
     call load_kernel
-    mov si, KERNEL_SUCCESS_MSG
-    call print_string_16
-
     call switch_pm
     jmp $                       ; keep jmp here (do not excecute functions past here)
 
-print_string_16:
-    pusha
-    mov ah, 0x0e
-    .loop:
-        mov al, [si]
-        inc si
-        cmp al, 0
-        je .done
-        int 0x10
-        jmp .loop
-    .done:
-        popa
-        ret
-
 load_kernel:
-    mov si, LOAD_KERNEL_MSG
-    call print_string_16
-
     mov ah, 2
     mov al, 15
     mov ch, 0
@@ -66,15 +46,9 @@ load_kernel:
     ret
 
 handle_disk_error:
-    mov si, DISK_ERROR_MSG
-    call print_string_16
     jmp $                       ; stop program after disk error
 
 switch_pm:
-    mov ah, 0x0
-    mov al, 0x3
-    int 0x10
-    
     cli
     lgdt [gdt_descriptor]
 
@@ -127,10 +101,6 @@ start_protected_mode:
     jmp KERNEL_OFFSET
 
 BOOT_DRIVE_NUMBER: db 0
-REAL_MODE_MSG: db "Started in 16-bit real mode...", 13, 10, 0
-LOAD_KERNEL_MSG: db "Loading kernel into RAM at 0x1000...", 13, 10, 0
-DISK_ERROR_MSG: db "Disk read failed!", 13, 10, 0
-KERNEL_SUCCESS_MSG: db "Kernel loaded successfully!", 13, 10, 0
 
 times 510-($-$$) db 0           ; fill sector
 db 0x55, 0xaa                   ; add bootloader signature
