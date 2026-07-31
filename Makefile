@@ -12,7 +12,7 @@ KERNEL_OBJ = $(BUILD_DIR)/kernel.o
 KERNEL_BIN = $(BUILD_DIR)/kernel.bin
 OS_IMAGE   = $(BUILD_DIR)/os_image.bin
 
-CXXFLAGS = -m32 -ffreestanding -fno-pie -fno-rtti -fno-exceptions -nostdlib -Wall -Wextra
+CXXFLAGS = -ffreestanding -fno-pie -fno-rtti -fno-exceptions -Wall -Wextra
 
 all: $(OS_IMAGE)
 
@@ -27,13 +27,13 @@ $(BOOT_BIN): $(BOOT_SRC) | $(BUILD_DIR)
 	@nasm -f bin $(BOOT_SRC) -o $(BOOT_BIN)
 
 $(KERNEL_BIN): $(ENTRY_OBJ) $(KERNEL_OBJ) $(LINKER_SCRIPT) | $(BUILD_DIR)
-	@ld -m elf_i386 -T $(LINKER_SCRIPT) $(ENTRY_OBJ) $(KERNEL_OBJ) -o $(KERNEL_BIN) --oformat binary
+	@i386-elf-ld -m elf_i386 -nostdlib -T $(LINKER_SCRIPT) $(ENTRY_OBJ) $(KERNEL_OBJ) -o $(KERNEL_BIN) --oformat binary
 
 $(ENTRY_OBJ): $(ENTRY_SRC) | $(BUILD_DIR)
 	@nasm -f elf32 $(ENTRY_SRC) -o $(ENTRY_OBJ)
 
 $(KERNEL_OBJ): $(KERNEL_SRC) | $(BUILD_DIR)
-	@g++ $(CXXFLAGS) -c $(KERNEL_SRC) -o $(KERNEL_OBJ)
+	@i386-elf-g++ $(CXXFLAGS) -c $(KERNEL_SRC) -o $(KERNEL_OBJ)
 
 run: $(OS_IMAGE)
 	@qemu-system-i386 -fda $(OS_IMAGE)
