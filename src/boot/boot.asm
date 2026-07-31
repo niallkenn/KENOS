@@ -4,6 +4,7 @@
 KERNEL_OFFSET equ 0x1000        ; kernel entry start point
 
 .bootloader_start:
+    mov [BOOT_DRIVE_NUMBER], dl ; save boot drive number passed to dl by bios
     cli                         ; disable interrupts for setup
 
     ; ensure registers for tiny memory model
@@ -18,7 +19,6 @@ KERNEL_OFFSET equ 0x1000        ; kernel entry start point
 
     sti                         ; re-enable interrupts
 
-    mov [BOOT_DRIVE_NUMBER], dl ; save boot drive number passed to dl by bios
 
     mov si, REAL_MODE_MSG
     call print_string_16
