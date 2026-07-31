@@ -24,14 +24,14 @@
 print_string_16:
     pusha
     mov ah, 0x0e
-    loop:
+    .loop:
         mov al, [si]
         inc si
         cmp al, 0
         je done
         int 0x10
         jmp loop
-    done:
+    .done:
         popa
         ret
 
