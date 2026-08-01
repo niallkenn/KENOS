@@ -10,21 +10,74 @@ typedef signed long long   int64_t;
 
 enum VgaColor : uint8_t {
     BLACK         = 0,
-    DARK_BLUE          = 1,
-    DARK_GREEN         = 2,
+    DARK_BLUE     = 1,
+    DARK_GREEN    = 2,
     CYAN          = 3,
-    DARK_RED           = 4,
+    DARK_RED      = 4,
     MAGENTA       = 5,
     BROWN         = 6,
     LIGHT_GREY    = 7,
     DARK_GREY     = 8,
-    PURPLE    = 9,
+    PURPLE        = 9,
     LIGHT_GREEN   = 10,
     LIGHT_BLUE    = 11,
     LIGHT_RED     = 12,
-    PINK = 13,
+    PINK          = 13,
     YELLOW        = 14,
     WHITE         = 15
+};
+
+class PortIO {
+    public:
+        PortIO() = delete;
+
+        static inline void outb(uint16_t port, uint8_t value) {
+            asm volatile(
+                "outb %b0, %w1"
+                :
+                : "a"(value), "Nd"(port)
+                : "memory"
+            );
+        }
+
+        static inline uint8_t inb(uint16_t port) {
+            uint8_t result;
+
+            asm volatile(
+                "inb %w1, %b0"
+                : "=a"(result)
+                : "Nd"(port)
+                : "memory"
+            );
+            return result;
+        }
+};
+
+class Keyboard {
+    private:
+        static constexpr char scancode_map[128] = {
+            0,   27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b', // 0x00 - 0x0E
+            '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',     // 0x0F - 0x1C
+            0,  'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',          // 0x1D - 0x28
+            0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',    0,          // 0x29 - 0x35
+            '*',    0, ' '
+        };
+
+        static inline uint8_t last_scancode = 0;
+
+    public:
+        static char get_char() {
+            uint8_t scancode = PortIO::inb(0x60);
+
+            if (scancode == last_scancode) return 0;
+            last_scancode = scancode;
+
+            if (scancode & 0x80) return 0;
+
+            if (scancode < 128) {
+                return scancode_map[scancode];
+            } else return 0;
+        }
 };
 
 class Screen {
@@ -61,7 +114,64 @@ class Shell : protected Screen{
         };
         const FontInfo* const fontInfo = (const FontInfo*)0x7D90;
 
+        
+    public:
+        using Screen::put_pixel;
+        
+        Shell(int tlx, int tly, int brx, int bry, uint8_t color) : 
+            tlx(tlx), tly(tly), brx(brx), bry(bry), color(color) {
+                cx = tlx;
+                cy = tly;
+                clear();
+        }
+
+        void handle_backspace() {
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    put_pixel(cx + col, cy + row, color);
+                }
+            }
+        }   
+        
+        void print_char(char c, uint8_t color) {
+            if (c == '\n') {
+                cy+=8;
+                cx=tlx;
+                return;
+            }
+
+            if (c == '\t') {
+                print_char(' ', color);
+                print_char(' ', color);
+                return;
+            }
+
+            if (c == '\b') {
+                if (cx - 8 < tlx && cy != tly) {
+                    cy -= 8;
+                    cx = (((320 - 2 * tlx) / 8) * 8) + tlx;
+                } else if (cx - 8 < tlx && cy == tly) {
+                    handle_backspace();
+                    return;
+                }
+
+                cx-=8;
+                handle_backspace();
+                return;
+            }
+
+            if (cx + 8 > brx) {
+                cy+=8;
+                cx = tlx;
+            }
+            
+            print_char(c, cx, cy, color);
+            cx+=8;
+        }
+        
         void print_char(char c, int x, int y, uint8_t color) {
+            if (x < tlx || (x + 8) > brx || y < tly || (y + 8) > bry) return;
+
             uint32_t fontBase = ((uint32_t)fontInfo->segment * 16) + fontInfo->offset;
 
             const uint8_t* glyph = (const uint8_t*)fontBase + ((uint8_t)c * 8);
@@ -75,26 +185,6 @@ class Shell : protected Screen{
                     }
                 }
             }
-        }
-
-    public:
-        using Screen::put_pixel;
-
-        Shell(int tlx, int tly, int brx, int bry, uint8_t color) : 
-            tlx(tlx), tly(tly), brx(brx), bry(bry), color(color) {
-                cx = tlx;
-                cy = tly;
-                clear();
-        }
-
-        void print_char(char c, uint8_t color) {
-            if (cx + 8 > brx) {
-                    cy+=8;
-                    cx = tlx;
-                }
-
-                print_char(c, cx, cy, color);
-                cx+=8;
         }
 
         void print(const char* string, uint8_t color) {
@@ -118,28 +208,19 @@ class Shell : protected Screen{
         }
 
         void clear() {
-            for (int x=0;x<320;x++) {
-                for (int y=0;y<200;y++) {
-                    if (!(x < tlx || x >= brx || y < tly || y >= bry)) {
-                        put_pixel(x, y, color);
-                    }
+            for (int x=tlx;x<brx;x++) {
+                for (int y=tly;y<bry;y++) {              
+                    put_pixel(x, y, color);           
                 }
             }
         }
 };
 
 extern "C" void main() {
-    Shell shellb(0, 0, 158, 200, DARK_GREEN);
-    Shell shellw(162, 0, 320, 200, DARK_RED);
-    Shell shellm(158, 0, 162, 200, WHITE);
+    Shell shell(50, 50, 270, 150, BLACK);
     
-    shellb.print("Red on green\nIsn't this great.", DARK_RED);
-    shellw.print("Oh the green and red of mayo\nI can see it still\nIts soft and craggy boglands\n"
-        "Its tall majestic hills\nWhen the ocean kisses Ireland\nAnd the waves caress the shore\nOh the feeling it came over me\n"
-        "to stay forevermore,\nFOREVERMORE", DARK_GREEN);
-        
-        
     while (1) {
-        asm volatile("hlt");
+        char c = Keyboard::get_char();
+        if (c!=0) shell.print_char(c, LIGHT_GREY);
     }
 }
