@@ -75,17 +75,26 @@ class Shell : protected Screen{
                     }
                 }
             }
-            cx+=8;
         }
 
     public:
-        using Screen::clear_screen;
+        using Screen::put_pixel;
 
         Shell(int tlx, int tly, int brx, int bry, uint8_t color) : 
             tlx(tlx), tly(tly), brx(brx), bry(bry), color(color) {
                 cx = tlx;
                 cy = tly;
-                clear_screen(color);
+                clear();
+        }
+
+        void print_char(char c, uint8_t color) {
+            if (cx + 8 > brx) {
+                    cy+=8;
+                    cx = tlx;
+                }
+
+                print_char(c, cx, cy, color);
+                cx+=8;
         }
 
         void print(const char* string, uint8_t color) {
@@ -104,21 +113,32 @@ class Shell : protected Screen{
 
                 print_char(string[index], cx, cy, color);
                 index++;
+                cx+=8;
             }
         }
 
         void clear() {
-            clear_screen(color);
+            for (int x=0;x<320;x++) {
+                for (int y=0;y<200;y++) {
+                    if (!(x < tlx || x >= brx || y < tly || y >= bry)) {
+                        put_pixel(x, y, color);
+                    }
+                }
+            }
         }
 };
 
 extern "C" void main() {
-    int border_x = 40;
-    int border_y = 40;
-    Shell shell(border_x, border_y, 320 - border_x, 200 - border_y, BLACK);
-
-    shell.print("Finally writing text in vga mode 13h, lets see if I'm smart enough to write text wrap", WHITE);
-
+    Shell shellb(0, 0, 158, 200, DARK_GREEN);
+    Shell shellw(162, 0, 320, 200, DARK_RED);
+    Shell shellm(158, 0, 162, 200, WHITE);
+    
+    shellb.print("Red on green\nIsn't this great.", DARK_RED);
+    shellw.print("Oh the green and red of mayo\nI can see it still\nIts soft and craggy boglands\n"
+        "Its tall majestic hills\nWhen the ocean kisses Ireland\nAnd the waves caress the shore\nOh the feeling it came over me\n"
+        "to stay forevermore,\nFOREVERMORE", DARK_GREEN);
+        
+        
     while (1) {
         asm volatile("hlt");
     }
