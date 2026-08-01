@@ -91,6 +91,17 @@ class Shell : protected Screen{
         void print(const char* string, uint8_t color) {
             int index = 0;
             while (string[index]) {
+                if (string[index] == '\n') {
+                    cy += 8;
+                    cx = tlx;
+                    index++;
+                }
+
+                if (cx + 8 > brx) {
+                    cy+=8;
+                    cx = tlx;
+                }
+
                 print_char(string[index], cx, cy, color);
                 index++;
             }
@@ -102,9 +113,11 @@ class Shell : protected Screen{
 };
 
 extern "C" void main() {
-    Shell shell(7, 7, 320 - 7, 200 - 7, BLACK);
+    int border_x = 40;
+    int border_y = 40;
+    Shell shell(border_x, border_y, 320 - border_x, 200 - border_y, BLACK);
 
-    shell.print("Finally writing text in vga mode 13h", WHITE);
+    shell.print("Finally writing text in vga mode 13h, lets see if I'm smart enough to write text wrap", WHITE);
 
     while (1) {
         asm volatile("hlt");
