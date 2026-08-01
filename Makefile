@@ -12,7 +12,7 @@ KERNEL_OBJ = $(BUILD_DIR)/kernel.o
 KERNEL_BIN = $(BUILD_DIR)/kernel.bin
 OS_IMAGE   = $(BUILD_DIR)/os_image.bin
 
-CXXFLAGS = -ffreestanding -fno-pie -fno-rtti -fno-exceptions -Wall -Wextra
+CXXFLAGS = -m32 -ffreestanding -fno-pie -fno-rtti -fno-exceptions -Wall -Wextra
 
 all: $(OS_IMAGE)
 

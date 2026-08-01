@@ -23,6 +23,16 @@ KERNEL_OFFSET equ 0x1000        ; kernel entry start point
     mov ax, 0x0013
     int 0x10
 
+    ; --- NEW: Get the 8x8 BIOS font pointer ---
+    push es                     ; Save ES register
+    mov ax, 0x1130              ; BIOS function: Get Font Information
+    mov bh, 3                   ; BH = 3 requests the 8x8 font pointer
+    int 0x10                    ; Returns segment in ES, offset in BP
+    
+    mov [FONT_SEGMENT], es      ; Save the segment
+    mov [FONT_OFFSET], bp       ; Save the offset
+    pop es                      ; Restore ES register
+
     call load_kernel
     call switch_pm
     jmp $                       ; keep jmp here (do not excecute functions past here)
@@ -100,6 +110,10 @@ start_protected_mode:
 
     jmp KERNEL_OFFSET
 
+times 400-($-$$) db 0
+
+FONT_OFFSET:       dw 0         ; Stores font offset pointer
+FONT_SEGMENT:      dw 0
 BOOT_DRIVE_NUMBER: db 0
 
 times 510-($-$$) db 0           ; fill sector
