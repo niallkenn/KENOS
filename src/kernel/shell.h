@@ -26,9 +26,14 @@ class Shell : protected Screen{
         
         Shell(int tlx, int tly, int brx, int bry, uint8_t color);
 
+        Shell& operator=(const Shell& other);
+        Shell(const Shell& other);
+
         void handle_backspace();
         void print_char(char c, uint8_t color);
         void print_char(char c, int x, int y, uint8_t color);
         void print(const char* string, uint8_t color);
         void clear();
 };
+
+Shell init_shell(int tlx, int tly, int brx, int bry, uint8_t fg_color, uint8_t bgcolor);

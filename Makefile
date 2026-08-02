@@ -43,7 +43,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/kernel/%.cpp | $(BUILD_DIR)
 	@i386-elf-g++ $(CPPFLAGS) -c $< -o $@
 
 run: $(OS_IMAGE)
-	@qemu-system-i386 -fda $(OS_IMAGE)
+	@qemu-system-i386 -drive file=$(OS_IMAGE),format=raw,if=floppy
 
 clean:
 	rm -rf $(BUILD_DIR)

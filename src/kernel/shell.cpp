@@ -1,5 +1,12 @@
 #include "shell.h"
 
+Shell init_shell(int tlx, int tly, int brx, int bry, uint8_t fg_color, uint8_t bgcolor) {
+    Shell shell(tlx, tly, brx, bry, bgcolor);
+    shell.clear_screen(bgcolor);
+    shell.print_char('>', fg_color);
+    return shell;
+}
+
 void Shell::handle_backspace() {
     for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 8; col++) {
@@ -13,6 +20,26 @@ Shell::Shell(int tlx, int tly, int brx, int bry, uint8_t color) :
         cx = tlx;
         cy = tly;
         clear();
+}
+
+Shell& Shell::operator=(const Shell& other) {
+    if (this != &other) {
+        tlx = other.tlx;
+        tly = other.tly;
+        brx = other.brx;
+        bry = other.bry;
+        color = other.color;
+    }
+
+    return *this;
+}
+
+Shell::Shell(const Shell& other) {
+    tlx = other.tlx;
+    tly = other.tly;
+    brx = other.brx;
+    bry = other.bry;
+    color = other.color;
 }
         
 void Shell::print_char(char c, uint8_t color) {
