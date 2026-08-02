@@ -14,10 +14,10 @@ BOOT_BIN   = $(BUILD_DIR)/boot.bin
 ENTRY_OBJ  = $(BUILD_DIR)/kernel_entry.o
 KERNEL_OBJ = $(BUILD_DIR)/kernel.o
 KERNEL_BIN = $(BUILD_DIR)/kernel.bin
-OS_IMAGE   = $(BUILD_DIR)/os_image.
+OS_IMAGE   = $(BUILD_DIR)/os_image.bin
 
 CPPFILES = $(KERNEL_SRC) $(PORTIO_SRC) $(KEYBOARD_SRC) $(SCREEN_SRC) $(SHELL_SRC)
-
+CPPOBJS = $(patsubst $(SRC_DIR)/kernel/%.cpp, $(BUILD_DIR)/%.o, $(CPPFILES))
 CPPFLAGS = -m32 -ffreestanding -fno-pie -fno-rtti -fno-exceptions -Wall -Wextra
 
 all: $(OS_IMAGE)
@@ -32,14 +32,14 @@ $(OS_IMAGE): $(BOOT_BIN) $(KERNEL_BIN) | $(BUILD_DIR)
 $(BOOT_BIN): $(BOOT_SRC) | $(BUILD_DIR)
 	@nasm -f bin $(BOOT_SRC) -o $(BOOT_BIN)
 
-$(KERNEL_BIN): $(ENTRY_OBJ) $(KERNEL_OBJ) $(LINKER_SCRIPT) | $(BUILD_DIR)
-	@i386-elf-ld -m elf_i386 -nostdlib -T $(LINKER_SCRIPT) $(ENTRY_OBJ) $(KERNEL_OBJ) -o $(KERNEL_BIN) --oformat binary
+$(KERNEL_BIN): $(ENTRY_OBJ) $(CPPOBJS) $(LINKER_SCRIPT) | $(BUILD_DIR)
+	@i386-elf-ld -m elf_i386 -nostdlib -T $(LINKER_SCRIPT) $(ENTRY_OBJ) $(CPPOBJS) -o $(KERNEL_BIN) --oformat binary
 
 $(ENTRY_OBJ): $(ENTRY_SRC) | $(BUILD_DIR)
 	@nasm -f elf32 $(ENTRY_SRC) -o $(ENTRY_OBJ)
 
-$(KERNEL_OBJ): $(CPPFILES) | $(BUILD_DIR)
-	@i386-elf-g++ $(CPPFLAGS) -c $(KERNEL_SRC) -o $(KERNEL_OBJ)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/kernel/%.cpp | $(BUILD_DIR)
+	@i386-elf-g++ $(CPPFLAGS) -c $< -o $@
 
 run: $(OS_IMAGE)
 	@qemu-system-i386 -fda $(OS_IMAGE)

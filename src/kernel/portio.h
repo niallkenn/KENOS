@@ -1,8 +1,8 @@
 #pragma once
-
+#include "definitions.h"
 class PortIO {
     public:
-        PortIO();
+        PortIO() = delete;
 
         static inline void outb(uint16_t port, uint8_t value) {
             asm volatile(
