@@ -9,6 +9,7 @@ KEYBOARD_SRC = $(SRC_DIR)/kernel/keyboard.cpp
 SCREEN_SRC = $(SRC_DIR)/kernel/screen.cpp
 SHELL_SRC = $(SRC_DIR)/kernel/shell.cpp
 MEMORY_ALLOCATOR_SRC = $(SRC_DIR)/kernel/memoryallocator.cpp
+STRING_SRC = $(SRC_DIR)/kernel/string.cpp
 LINKER_SCRIPT = $(SRC_DIR)/linker.ld
 
 BOOT_BIN   = $(BUILD_DIR)/boot.bin
@@ -17,7 +18,7 @@ KERNEL_OBJ = $(BUILD_DIR)/kernel.o
 KERNEL_BIN = $(BUILD_DIR)/kernel.bin
 OS_IMAGE   = $(BUILD_DIR)/os_image.bin
 
-CPPFILES = $(KERNEL_SRC) $(PORTIO_SRC) $(KEYBOARD_SRC) $(SCREEN_SRC) $(SHELL_SRC) $(MEMORY_ALLOCATOR_SRC)
+CPPFILES = $(KERNEL_SRC) $(PORTIO_SRC) $(KEYBOARD_SRC) $(SCREEN_SRC) $(SHELL_SRC) $(MEMORY_ALLOCATOR_SRC) $(STRING_SRC)
 CPPOBJS = $(patsubst $(SRC_DIR)/kernel/%.cpp, $(BUILD_DIR)/%.o, $(CPPFILES))
 CPPFLAGS = -m32 -ffreestanding -fno-pie -fno-rtti -fno-exceptions -Wall -Wextra
 
