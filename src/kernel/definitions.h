@@ -10,7 +10,7 @@ typedef signed short       int16_t;
 typedef signed int         int32_t;
 typedef signed long long   int64_t;
 
-typedef unsigned int size_t;
+typedef __SIZE_TYPE__ size_t;
 typedef int ssize_t;
 
 typedef int ptrdiff_t;
