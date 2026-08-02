@@ -59,6 +59,16 @@ class Vector {
             return *this;
         }
 
+        bool operator==(const Vector& other) {
+            if (size != other.size) return false;
+
+            for (size_t i=0;i<size;i++) {
+                if (data[i] != other.data[i]) return false;
+            }
+
+            return true;
+        }
+
         void push_back(const T& value) {
             if (size >= capacity) {
                 size_t new_capacity = (size == 0) ? 1 : capacity * 2;
