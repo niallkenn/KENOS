@@ -60,6 +60,14 @@ class Vector {
         }
 
         bool operator==(const Vector& other) {
+            if (size == 0 || other.size == 0) {
+                if (size == other.size) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
             if (size != other.size) return false;
 
             for (size_t i=0;i<size;i++) {
