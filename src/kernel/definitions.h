@@ -10,6 +10,11 @@ typedef signed short       int16_t;
 typedef signed int         int32_t;
 typedef signed long long   int64_t;
 
+typedef unsigned int size_t;
+typedef int ssize_t;
+
+typedef int ptrdiff_t;
+
 enum VgaColor : uint8_t {
     BLACK         = 0,
     DARK_BLUE     = 1,
