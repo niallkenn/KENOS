@@ -1,31 +1,8 @@
-typedef unsigned char      uint8_t;
-typedef unsigned short     uint16_t;
-typedef unsigned int       uint32_t;
-typedef unsigned long long uint64_t;
-
-typedef signed char        int8_t;
-typedef signed short       int16_t;
-typedef signed int         int32_t;
-typedef signed long long   int64_t;
-
-enum VgaColor : uint8_t {
-    BLACK         = 0,
-    DARK_BLUE     = 1,
-    DARK_GREEN    = 2,
-    CYAN          = 3,
-    DARK_RED      = 4,
-    MAGENTA       = 5,
-    BROWN         = 6,
-    LIGHT_GREY    = 7,
-    DARK_GREY     = 8,
-    PURPLE        = 9,
-    LIGHT_GREEN   = 10,
-    LIGHT_BLUE    = 11,
-    LIGHT_RED     = 12,
-    PINK          = 13,
-    YELLOW        = 14,
-    WHITE         = 15
-};
+#include "definitions.h"
+#include "keyboard.h"
+#include "portio.h"
+#include "screen.h"
+#include "shell.h"
 
 class PortIO {
     public:
@@ -218,6 +195,8 @@ class Shell : protected Screen{
 
 extern "C" void main() {
     Shell shell(50, 50, 270, 150, BLACK);
+
+    shell.print(">", LIGHT_GREY);
     
     while (1) {
         char c = Keyboard::get_char();
