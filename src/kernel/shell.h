@@ -4,13 +4,14 @@
 
 class Shell : protected Screen{
     private:
-        int tlx;
-        int tly;
-        int brx;
-        int bry;
-        int cx;
-        int cy;
+        int tlx, tly;
+        int brx, bry;
+
+        int cx, cy;
+
         uint8_t color;
+
+        int last_arrow_y = tly;
 
         struct __attribute__((packed)) FontInfo {
             uint16_t offset;
@@ -21,6 +22,7 @@ class Shell : protected Screen{
         
     public:
         using Screen::put_pixel;
+        using Screen::clear_screen;
         
         Shell(int tlx, int tly, int brx, int bry, uint8_t color);
 

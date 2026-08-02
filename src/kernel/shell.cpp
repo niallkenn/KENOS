@@ -19,6 +19,8 @@ void Shell::print_char(char c, uint8_t color) {
     if (c == '\n') {
         cy+=8;
         cx=tlx;
+        print_char('>', color);
+        last_arrow_y = cy;
         return;
     }
 
@@ -29,7 +31,9 @@ void Shell::print_char(char c, uint8_t color) {
     }
 
     if (c == '\b') {
-        if (cx - 8 < tlx && cy != tly) {
+        if (last_arrow_y == cy && cx - 8 == tlx) {
+            return;
+        } else if (cx - 8 < tlx && cy != tly) {
             cy -= 8;
             cx = (((320 - 2 * tlx) / 8) * 8) + tlx;
         } else if (cx - 8 < tlx && cy == tly) {
