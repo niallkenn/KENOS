@@ -4,6 +4,7 @@
 #include "screen.h"
 #include "shell.h"
 #include "vector.h"
+#include "string.h"
 
 extern "C" void main() {
     uint8_t fg_color = LIGHT_GREY;
