@@ -1,7 +1,7 @@
 # Big dumb brain-dump
 ##### (say that quick)
 
-#### 04/08
+### 04/08
 so the memory allocator I have does things well. Obviously not well enough. Its just allocating from a
 static array which is no good no good for my high high standards (not satisfactory). I want it to *live in
 actual RAM.* instead of MemoryAllocator having
