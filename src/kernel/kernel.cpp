@@ -10,7 +10,17 @@ extern "C" void main() {
     uint8_t fg_color = LIGHT_GREY;
     uint8_t bg_color = BLACK;
     Shell shell = init_shell(7, 7, 313, 193, fg_color, bg_color);
+    shell.clear();
 
+    String s1("Hey");
+    s1 = "Hey but ";
+    
+    String s2 = "sexier";
+
+    s1 += s2;
+    s1 += ".";
+
+    shell.print(s1, DARK_RED);
     while (true) {
         char c = Keyboard::get_char();
 

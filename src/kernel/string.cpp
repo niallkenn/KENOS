@@ -28,6 +28,11 @@ String::String() noexcept : m_data(nullptr), m_length(0), m_capacity(0) {
 }
 
 String::String(const char* str) noexcept : m_data(nullptr), m_length(0), m_capacity(0) {
+    if (!str) {
+        reallocate(8);
+        return;
+    }
+
     size_t len = kstrlen(str);
     reallocate(len > 8 ? len : 8);
 
@@ -52,8 +57,6 @@ String::String(const String& other) noexcept : m_data(nullptr), m_length(0), m_c
 
 String& String::operator=(const String& other) noexcept {
     if (this != &other) {
-        clear();
-
         if (other.m_length > m_capacity) {
             reallocate(other.m_length);
         }
@@ -103,18 +106,40 @@ String& String::operator+=(char c) noexcept {
 }
 
 String& String::operator+=(const char* str) noexcept {
+    if (!str) return *this;
     size_t strlen = kstrlen(str);
 
-    for (size_t i = 0; i < strlen; i++) push_back(str[i]);
+    if (m_length + strlen > m_capacity) reallocate((m_length + strlen) * 2);
+
+    for (size_t i = 0; i < strlen; i++) m_data[m_length+i] = str[i];
+    m_length+=strlen;
+    m_data[m_length] = '\0';
 
     return *this;
 }
 
 String& String::operator+=(const String& other) noexcept {
-    for (size_t i = 0; i < other.m_length; i++) {
-        push_back(other.m_data[i]);
+    if (other.m_length == 0) return *this;
+
+    size_t new_len = m_length + other.m_length;
+    if (new_len > m_capacity) {
+        size_t new_cap = new_len * 2;
+        char* new_data = new char[new_cap + 1];
+
+        for (size_t i = 0; i < m_length; i++) new_data[i] = m_data[i];
+        for (size_t i = 0; i < other.m_length; i++) new_data[m_length + i] = other.m_data[i];
+
+        delete[] m_data;
+        m_data = new_data;
+        m_capacity = new_cap;
+    } else {
+        for (size_t i = 0; i < other.m_length; i++) {
+            m_data[m_length + i] = other.m_data[i];
+        }
     }
 
+    m_length = new_len;
+    m_data[m_length] = '\0';
     return *this;
 }
 
@@ -148,23 +173,33 @@ bool String::operator!=(const String& other) const noexcept {
     return !(*this == other);
 }
 
-String& String::operator=(const char* str) {
-    if (*this != str) {
+String& String::operator=(const char* str) noexcept {
+    if (!str) {
         clear();
+        return *this;
+    }
 
-        size_t len = kstrlen(str);
+    size_t len = kstrlen(str);
 
-        if (len > m_capacity) {
-            reallocate(len);
+    if (len > m_capacity) {
+        char* new_data = new char[len + 1];
+
+        for (size_t i = 0; i < len; i++) {
+            new_data[i] = str[i];
         }
 
+        delete[] m_data;
+
+        m_data = new_data;
+        m_capacity = len;
+    } else {
         for (size_t i = 0; i < len; i++) {
             m_data[i] = str[i];
         }
-
-        m_length = len;
-        m_data[m_length] = '\0';
     }
+
+    m_length = len;
+    m_data[m_length] = '\0';
 
     return *this;
 }

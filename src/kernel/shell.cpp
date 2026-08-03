@@ -120,6 +120,10 @@ void Shell::print(const char* string, uint8_t color) {
     }
 }
 
+void Shell::print(const String& str, uint8_t color) {
+    print(str.c_str(), color);
+}
+
 void Shell::clear() {
     for (int x=tlx;x<brx;x++) {
         for (int y=tly;y<bry;y++) {              

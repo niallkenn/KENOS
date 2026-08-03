@@ -21,7 +21,7 @@ void* MemoryAllocator::malloc(size_t size) noexcept {
             constexpr size_t minimum_split_size = sizeof(BlockHeader) + alignment;
 
             if (curr->size >= size + minimum_split_size) {
-                BlockHeader* leftover_block = reinterpret_cast<BlockHeader*>(curr);
+                BlockHeader* leftover_block = reinterpret_cast<BlockHeader*>(reinterpret_cast<uint8_t*>(curr + 1) + size);
 
                 leftover_block->size = curr->size - size - sizeof(BlockHeader);
                 leftover_block->next = curr->next;
