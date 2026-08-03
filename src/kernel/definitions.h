@@ -14,6 +14,8 @@ typedef __SIZE_TYPE__ size_t;
 typedef int ssize_t;
 
 typedef int ptrdiff_t;
+typedef uint32_t uintptr_t;
+typedef int32_t intptr_t;
 
 enum VgaColor : uint8_t {
     BLACK         = 0,

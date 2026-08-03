@@ -68,8 +68,40 @@ void MemoryAllocator::kfree(void *ptr) noexcept
 
     BlockHeader* block = reinterpret_cast<BlockHeader*>(ptr) - 1;
 
-    block->next = free_list_head;
-    free_list_head = block;
+    BlockHeader *previous = nullptr;
+    BlockHeader *current = free_list_head;
+
+    uintptr_t block_address = reinterpret_cast<uintptr_t>(block);
+    uintptr_t current_address = reinterpret_cast<uintptr_t>(current);
+    uintptr_t previous_address = reinterpret_cast<uintptr_t>(previous);
+
+    while (current != nullptr) {
+        if (previous_address < block_address && block_address < current_address) break;
+        else {
+            previous = current;
+            current = current->next;
+        }
+    }
+
+    if (previous == nullptr) {
+        free_list_head = block;
+    } else {
+        previous->next = block;
+    }
+    
+    block->next = current;
+
+    if (reinterpret_cast<uint8_t*>(block + 1) + block->size == reinterpret_cast<uint8_t*>(block->next)) {
+        block->size += sizeof(BlockHeader) + block->next->size;
+        block->next = block->next->next;
+    }
+
+    if (reinterpret_cast<uint8_t*>(block) == reinterpret_cast<uint8_t*>(previous + 1) + previous->size) {
+        previous->size += sizeof(BlockHeader) + block->size;
+        previous->next = block->next;
+    }
+
+    return;
 }
 
 void *operator new(size_t size) noexcept
