@@ -1,7 +1,6 @@
 #pragma once
 #include "definitions.h"
 #include "screen.h"
-#include "string.h"
 
 class Shell : protected Screen{
     private:
@@ -34,7 +33,6 @@ class Shell : protected Screen{
         void print_char(char c, uint8_t color);
         void print_char(char c, int x, int y, uint8_t color);
         void print(const char* string, uint8_t color);
-        void print(const String& str, uint8_t color);
         void clear();
 };
 
