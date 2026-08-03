@@ -10,15 +10,19 @@ extern "C" void main() {
     uint8_t bg_color = BLACK;
     Shell shell = init_shell(7, 7, 313, 193, fg_color, bg_color);
 
-    
-    char* a = new char[10];
-    char* b = new char[20];
+    char* s1 = new char[20]{"Hey there"};
+    char* s2 = new char[20]{" sigma.\n"};
 
-    if (a == b)
-        shell.print("FAIL\n", fg_color);
-    else
-        shell.print("PASS\n", fg_color);
-        
+    shell.print(s1, fg_color);
+    shell.print(s2, DARK_RED);
+
+    delete[] s2;
+
+    char* s3 = new char[20]{" not sigma."};
+
+    shell.print(s1, fg_color);
+    shell.print(s2, PINK);
+
     while (true) {
         char c = Keyboard::get_char();
 
