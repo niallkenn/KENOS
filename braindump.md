@@ -10,6 +10,7 @@ uint8_t heap[256 \* 1024];
 I want it to have
 
 **uint8_t\* heap_start;**
+
 **size_t heap_size;**
 
 To get these I need a **E820 memory map**, it's constructed in BIOS and it returns a list of places in memory and
@@ -33,3 +34,5 @@ waheyyy fuck you
 ok lock in. 
 
 i did a bit of reading and this shit is genuinely so complicated i need to sleep holy mother of jesus
+
+ok im acc doing it i have the whole thing planned in the todo, the whole way up. this will no joke kill me over the next month. it will take a month to understand it even 😂😂😂
