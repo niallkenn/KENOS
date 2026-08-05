@@ -13,5 +13,6 @@ void Shell::handle_enter() {
 }
 
 Shell::Shell(Terminal& terminal) : terminal(terminal){
+    terminal.put_char('>', terminal.get_fg());
     last_arrow_y = terminal.get_cy();
 }

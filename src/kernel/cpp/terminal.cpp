@@ -4,7 +4,6 @@
 Terminal::Terminal(int tlx, int tly, int brx, int bry, uint8_t fg_color, uint8_t bg_color) : 
     tlx(tlx), tly(tly), brx(brx), bry(bry), fg_color(fg_color), bg_color(bg_color) {
         clear();
-        put_char('>', fg_color);
 }
 
 void Terminal::backspace()
@@ -85,7 +84,7 @@ void Terminal::clear() {
 
     for (int i = tlx; i < brx; i++) {
         for (int j = tly; j < bry; j++) {
-            Screen::put_pixel(j, i, bg_color);
+            Screen::put_pixel(i, j, bg_color);
         }
     }
 }

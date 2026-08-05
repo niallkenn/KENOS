@@ -1,3 +1,3 @@
 #include "shell.h"
 
-void panic(const char* message, unsigned int number);
+[[noreturn]] void panic(const char* message, unsigned int number);
