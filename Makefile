@@ -2,23 +2,20 @@ SRC_DIR   = src
 BUILD_DIR = build
 
 BOOT_SRC   = $(SRC_DIR)/boot/boot.asm
-ENTRY_SRC  = $(SRC_DIR)/kernel/kernel_entry.asm
-KERNEL_SRC = $(SRC_DIR)/kernel/kernel.cpp
-KEYBOARD_SRC = $(SRC_DIR)/kernel/keyboard.cpp
-SCREEN_SRC = $(SRC_DIR)/kernel/screen.cpp
-SHELL_SRC = $(SRC_DIR)/kernel/shell.cpp
-MEMORY_ALLOCATOR_SRC = $(SRC_DIR)/kernel/memoryallocator.cpp
-#STRING_SRC = $(SRC_DIR)/kernel/string.cpp
 LINKER_SCRIPT = $(SRC_DIR)/linker.ld
 
 BOOT_BIN   = $(BUILD_DIR)/boot.bin
-ENTRY_OBJ  = $(BUILD_DIR)/kernel_entry.o
-KERNEL_OBJ = $(BUILD_DIR)/kernel.o
 KERNEL_BIN = $(BUILD_DIR)/kernel.bin
 OS_IMAGE   = $(BUILD_DIR)/os_image.bin
 
-CPPFILES = $(KERNEL_SRC) $(KEYBOARD_SRC) $(SCREEN_SRC) $(SHELL_SRC) $(MEMORY_ALLOCATOR_SRC) #$(STRING_SRC)
-CPPOBJS = $(patsubst $(SRC_DIR)/kernel/%.cpp, $(BUILD_DIR)/%.o, $(CPPFILES))
+ASM_SRCS = $(wildcard $(SRC_DIR)/kernel/*.asm)
+CPP_SRCS = $(wildcard $(SRC_DIR)/kernel/*.cpp)
+
+ASM_OBJS = $(patsubst $(SRC_DIR)/kernel/%.asm, $(BUILD_DIR)/%.o, $(ASM_SRCS))
+CPP_OBJS = $(patsubst $(SRC_DIR)/kernel/%.cpp, $(BUILD_DIR)/%.o, $(CPP_SRCS))
+
+ALL_OBJS = $(ASM_OBJS) $(CPP_OBJS)
+
 CPPFLAGS = -m32 -ffreestanding -fno-pie -fno-rtti -fno-exceptions -Wall -Wextra
 
 all: $(OS_IMAGE)
@@ -33,11 +30,11 @@ $(OS_IMAGE): $(BOOT_BIN) $(KERNEL_BIN) | $(BUILD_DIR)
 $(BOOT_BIN): $(BOOT_SRC) | $(BUILD_DIR)
 	@nasm -f bin $(BOOT_SRC) -o $(BOOT_BIN)
 
-$(KERNEL_BIN): $(ENTRY_OBJ) $(CPPOBJS) $(LINKER_SCRIPT) | $(BUILD_DIR)
-	@i386-elf-ld -m elf_i386 -nostdlib -T $(LINKER_SCRIPT) $(ENTRY_OBJ) $(CPPOBJS) -o $(KERNEL_BIN) --oformat binary
+$(KERNEL_BIN): $(ALL_OBJS) $(LINKER_SCRIPT) | $(BUILD_DIR)
+	@i386-elf-ld -m elf_i386 -nostdlib -T $(LINKER_SCRIPT) $(ALL_OBJS) -o $(KERNEL_BIN) --oformat binary
 
-$(ENTRY_OBJ): $(ENTRY_SRC) | $(BUILD_DIR)
-	@nasm -f elf32 $(ENTRY_SRC) -o $(ENTRY_OBJ)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/kernel/%.asm | $(BUILD_DIR)
+	@nasm -f elf32 $< -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/kernel/%.cpp | $(BUILD_DIR)
 	@i386-elf-g++ $(CPPFLAGS) -c $< -o $@
@@ -46,6 +43,6 @@ run: $(OS_IMAGE)
 	@qemu-system-i386 -drive file=$(OS_IMAGE),format=raw,if=floppy
 
 clean:
-	rm -rf $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR)
 
 .PHONY: all run clean

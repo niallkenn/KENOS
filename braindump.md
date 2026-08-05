@@ -36,3 +36,23 @@ ok lock in.
 i did a bit of reading and this shit is genuinely so complicated i need to sleep holy mother of jesus
 
 ok im acc doing it i have the whole thing planned in the todo, the whole way up. this will no joke kill me over the next month. it will take a month to understand it even 😂😂😂
+
+
+    idt.h
+    idt.cpp
+
+    isr.asm
+
+    interrupts.h
+    interrupts.cpp
+
+Responsibilities:
+
+IDT: owns the 256-entry table and loads it with lidt.
+isr.asm: low-level entry points, saves/restores registers, finishes with iret.
+interrupts.cpp: the C++ handlers (e.g. page_fault_handler, keyboard_handler, etc.).
+
+
+Im acctually locked i got the idt and divide by zero interrupt exception working.
+
+now just need to write kernel panic and then can move to memory map e820 and then hell 
