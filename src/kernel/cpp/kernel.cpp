@@ -5,29 +5,35 @@
 #include "shell.h"
 #include "memoryallocator.h"
 #include "idt.h"
+#include "terminal.h"
 
 extern "C" void main() {
     Idt::initialize();
 
-    uint8_t fg_color = LIGHT_GREY;
-    uint8_t bg_color = BLACK;
-    Shell shell = init_shell(0, 0, 313, 193, fg_color, bg_color);
+    Terminal t(5, 5, 315, 195, LIGHT_GREY, BLACK);
+    Shell s(t);
 
     while (true) {
         char c = Keyboard::get_char();
 
         if (c == 0) continue;
 
+        if (c == '\b') {
+            s.handle_backspace();
+            continue;
+        }
+
         if (c == '\n') {
-            handle_enter(shell);
+            s.handle_enter();
             continue;
         }
 
         if (c == '0') {
             int x = 0;
             int y = 5/x;
+            x = y;
         }
 
-        shell.print_char(c, fg_color);
+        t.put_char(c, t.get_fg());
     }
 }

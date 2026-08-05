@@ -21,11 +21,17 @@ class Terminal {
 
         void draw_char(char c, int x, int y, uint8_t color);
     public:
-        Terminal();
+        Terminal(int tlx, int tly, int brx, int bry, uint8_t fg_color, uint8_t bg_color);
 
         void put_char(char c, uint8_t color);
 
         void write(const char* string, uint8_t color);
 
+        int get_cy();
+        uint8_t get_fg();
+
         void clear();
+
+        void backspace();
+        void new_line();
 };

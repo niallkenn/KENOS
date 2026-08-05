@@ -1,125 +1,17 @@
 #include "shell.h"
-
-Shell init_shell(int tlx, int tly, int brx, int bry, uint8_t fg_color, uint8_t bgcolor) {
-    Shell shell(tlx, tly, brx, bry, fg_color, bgcolor);
-    Screen::clear_screen(bgcolor);
-    shell.print(">", fg_color);
-    return shell;
-}
+#include "terminal.h"
 
 void Shell::handle_backspace() {
-    for (int row = 0; row < 8; row++) {
-        for (int col = 0; col < 8; col++) {
-            Screen::put_pixel(cx + col, cy + row, bg_color);
-        }
-    }
+    // if length of command buffer is zero, return
+    terminal.backspace();
 }   
 
 void Shell::handle_enter() {
-    print("\n>", fg_color);
-    last_arrow_y = cy;
+    terminal.new_line();
+    terminal.put_char('>', terminal.get_fg());
+    last_arrow_y = terminal.get_cy();
 }
 
-Shell::Shell(int tlx, int tly, int brx, int bry, uint8_t fg_color, uint8_t bg_color) : 
-    tlx(tlx), tly(tly), brx(brx), bry(bry), bg_color(bg_color), fg_color(fg_color) {
-        cx = tlx;
-        cy = tly;
-        last_arrow_y = tly;
-        clear();
-}
-
-Shell& Shell::operator=(const Shell& other) {
-    if (this != &other) {
-        tlx = other.tlx;
-        tly = other.tly;
-        brx = other.brx;
-        bry = other.bry;
-        bg_color = other.bg_color;
-        fg_color = other.fg_color;
-        cx = other.cx;
-        cy = other.cy;
-        last_arrow_y = other.last_arrow_y;
-    }
-
-    return *this;
-}
-
-Shell::Shell(const Shell& other) : 
-    tlx(other.tlx), tly(other.tly), brx(other.brx), bry(other.bry), 
-    cx(other.cx), cy(other.cy), bg_color(other.bg_color), last_arrow_y(other.last_arrow_y) {
-
-}
-        
-void Shell::print_char(char c, uint8_t color) {
-    if (c == '\n') {
-        cy+=8;
-        cx=tlx;
-        return;
-    }
-
-    if (c == '\t') {
-        print_char(' ', color);
-        print_char(' ', color);
-        return;
-    }
-
-    if (c == '\b') {
-        if (last_arrow_y == cy && cx - 8 == tlx) {
-            return;
-        } else if (cx - 8 < tlx && cy != tly) {
-            cy -= 8;
-            cx = brx - 8;
-        } else if (cx - 8 < tlx && cy == tly) {
-            handle_backspace();
-            return;
-        }
-
-        cx-=8;
-        handle_backspace();
-        return;
-    }
-
-    if (cx + 8 > brx) {
-        cy+=8;
-        cx = tlx;
-    }
-    
-    print_char(c, cx, cy, color);
-    cx+=8;
-}
-
-void Shell::print_char(char c, int x, int y, uint8_t fg_color) {
-    if (x < tlx || (x + 8) > brx || y < tly || (y + 8) > bry) return;
-
-    uint32_t fontBase = ((uint32_t)fontInfo->segment * 16) + fontInfo->offset;
-
-    const uint8_t* glyph = (const uint8_t*)fontBase + ((uint8_t)c * 8);
-
-    for (int row = 0; row < 8; row++) {
-        uint8_t row_byte = glyph[row];
-
-        for (int col = 0; col < 8; col++) {
-            if (row_byte & (1 << (7 - col))) {
-                Screen::put_pixel(x + col, y + row, fg_color);
-            } else {
-                Screen::put_pixel(x+col, y + row, bg_color);
-            }
-        }
-    }
-}
-
-void Shell::print(const char* string, uint8_t color) {
-    int index = 0;
-    while (string[index]) {
-        print_char(string[index], color);
-        index++;
-    }
-}
-
-void Shell::clear() {
-    for (int x=tlx;x<brx;x++) {
-        for (int y=tly;y<bry;y++) {              
-            Screen::put_pixel(x, y, bg_color);           
-        }
-    }
+Shell::Shell(Terminal& terminal) : terminal(terminal){
+    last_arrow_y = terminal.get_cy();
 }
