@@ -2,9 +2,11 @@
 #include "definitions.h"
 class Screen {
     private:
-        volatile uint8_t* const vram = (volatile uint8_t*)0xA0000;
-
+        static volatile uint8_t* const vram;
+    
     public:
-        void put_pixel(int x, int y, uint8_t color);
-        void clear_screen(uint8_t color);
+        static void put_pixel(int x, int y, uint8_t color);
+        static void clear_screen(uint8_t color);
+
+        Screen() = delete;
 };

@@ -10,6 +10,10 @@ const char Keyboard::scancode_map[128] = {
 
 uint8_t Keyboard::last_scancode = 0;
 
+void handle_enter(Shell& shell) {
+    shell.handle_enter();
+}
+
 char Keyboard::get_char() {
     uint8_t scancode = PortIO::inb(0x60);
 

@@ -1,24 +1,30 @@
 #include "shell.h"
 
 Shell init_shell(int tlx, int tly, int brx, int bry, uint8_t fg_color, uint8_t bgcolor) {
-    Shell shell(tlx, tly, brx, bry, bgcolor);
-    shell.clear_screen(bgcolor);
-    shell.print_char('>', fg_color);
+    Shell shell(tlx, tly, brx, bry, fg_color, bgcolor);
+    Screen::clear_screen(bgcolor);
+    shell.print(">", fg_color);
     return shell;
 }
 
 void Shell::handle_backspace() {
     for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 8; col++) {
-            put_pixel(cx + col, cy + row, color);
+            Screen::put_pixel(cx + col, cy + row, bg_color);
         }
     }
 }   
 
-Shell::Shell(int tlx, int tly, int brx, int bry, uint8_t color) : 
-    tlx(tlx), tly(tly), brx(brx), bry(bry), color(color) {
+void Shell::handle_enter() {
+    print("\n>", fg_color);
+    last_arrow_y = cy;
+}
+
+Shell::Shell(int tlx, int tly, int brx, int bry, uint8_t fg_color, uint8_t bg_color) : 
+    tlx(tlx), tly(tly), brx(brx), bry(bry), bg_color(bg_color), fg_color(fg_color) {
         cx = tlx;
         cy = tly;
+        last_arrow_y = tly;
         clear();
 }
 
@@ -28,26 +34,26 @@ Shell& Shell::operator=(const Shell& other) {
         tly = other.tly;
         brx = other.brx;
         bry = other.bry;
-        color = other.color;
+        bg_color = other.bg_color;
+        fg_color = other.fg_color;
+        cx = other.cx;
+        cy = other.cy;
+        last_arrow_y = other.last_arrow_y;
     }
 
     return *this;
 }
 
-Shell::Shell(const Shell& other) {
-    tlx = other.tlx;
-    tly = other.tly;
-    brx = other.brx;
-    bry = other.bry;
-    color = other.color;
+Shell::Shell(const Shell& other) : 
+    tlx(other.tlx), tly(other.tly), brx(other.brx), bry(other.bry), 
+    cx(other.cx), cy(other.cy), bg_color(other.bg_color), last_arrow_y(other.last_arrow_y) {
+
 }
         
 void Shell::print_char(char c, uint8_t color) {
     if (c == '\n') {
         cy+=8;
         cx=tlx;
-        print_char('>', color);
-        last_arrow_y = cy;
         return;
     }
 
@@ -62,7 +68,7 @@ void Shell::print_char(char c, uint8_t color) {
             return;
         } else if (cx - 8 < tlx && cy != tly) {
             cy -= 8;
-            cx = (((320 - 2 * tlx) / 8) * 8) + tlx;
+            cx = brx - 8;
         } else if (cx - 8 < tlx && cy == tly) {
             handle_backspace();
             return;
@@ -82,7 +88,7 @@ void Shell::print_char(char c, uint8_t color) {
     cx+=8;
 }
 
-void Shell::print_char(char c, int x, int y, uint8_t color) {
+void Shell::print_char(char c, int x, int y, uint8_t fg_color) {
     if (x < tlx || (x + 8) > brx || y < tly || (y + 8) > bry) return;
 
     uint32_t fontBase = ((uint32_t)fontInfo->segment * 16) + fontInfo->offset;
@@ -94,7 +100,9 @@ void Shell::print_char(char c, int x, int y, uint8_t color) {
 
         for (int col = 0; col < 8; col++) {
             if (row_byte & (1 << (7 - col))) {
-                put_pixel(x + col, y + row, color);
+                Screen::put_pixel(x + col, y + row, fg_color);
+            } else {
+                Screen::put_pixel(x+col, y + row, bg_color);
             }
         }
     }
@@ -103,27 +111,15 @@ void Shell::print_char(char c, int x, int y, uint8_t color) {
 void Shell::print(const char* string, uint8_t color) {
     int index = 0;
     while (string[index]) {
-        if (string[index] == '\n') {
-            cy += 8;
-            cx = tlx;
-            index++;
-        }
-
-        if (cx + 8 > brx) {
-            cy+=8;
-            cx = tlx;
-        }
-
-        print_char(string[index], cx, cy, color);
+        print_char(string[index], color);
         index++;
-        cx+=8;
     }
 }
 
 void Shell::clear() {
     for (int x=tlx;x<brx;x++) {
         for (int y=tly;y<bry;y++) {              
-            put_pixel(x, y, color);           
+            Screen::put_pixel(x, y, bg_color);           
         }
     }
 }
