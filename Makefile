@@ -8,15 +8,15 @@ BOOT_BIN   = $(BUILD_DIR)/boot.bin
 KERNEL_BIN = $(BUILD_DIR)/kernel.bin
 OS_IMAGE   = $(BUILD_DIR)/os_image.bin
 
-ASM_SRCS = $(wildcard $(SRC_DIR)/kernel/*.asm)
-CPP_SRCS = $(wildcard $(SRC_DIR)/kernel/*.cpp)
+ASM_SRCS = $(wildcard $(SRC_DIR)/kernel/asm/*.asm)
+CPP_SRCS = $(wildcard $(SRC_DIR)/kernel/cpp/*.cpp)
 
-ASM_OBJS = $(patsubst $(SRC_DIR)/kernel/%.asm, $(BUILD_DIR)/%.o, $(ASM_SRCS))
-CPP_OBJS = $(patsubst $(SRC_DIR)/kernel/%.cpp, $(BUILD_DIR)/%.o, $(CPP_SRCS))
+ASM_OBJS = $(patsubst $(SRC_DIR)/kernel/asm/%.asm, $(BUILD_DIR)/asm/%.o, $(ASM_SRCS))
+CPP_OBJS = $(patsubst $(SRC_DIR)/kernel/cpp/%.cpp, $(BUILD_DIR)/cpp/%.o, $(CPP_SRCS))
 
 ALL_OBJS = $(ASM_OBJS) $(CPP_OBJS)
 
-CPPFLAGS = -m32 -ffreestanding -fno-pie -fno-rtti -fno-exceptions -Wall -Wextra
+CPPFLAGS = -m32 -ffreestanding -fno-pie -fno-rtti -fno-exceptions -Wall -Wextra -I$(SRC_DIR)/kernel/h
 
 all: $(OS_IMAGE)
 
@@ -33,10 +33,12 @@ $(BOOT_BIN): $(BOOT_SRC) | $(BUILD_DIR)
 $(KERNEL_BIN): $(ALL_OBJS) $(LINKER_SCRIPT) | $(BUILD_DIR)
 	@i386-elf-ld -m elf_i386 -nostdlib -T $(LINKER_SCRIPT) $(ALL_OBJS) -o $(KERNEL_BIN) --oformat binary
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/kernel/%.asm | $(BUILD_DIR)
+$(BUILD_DIR)/asm/%.o: $(SRC_DIR)/kernel/asm/%.asm | $(BUILD_DIR)
+	@mkdir -p $(dir $@)
 	@nasm -f elf32 $< -o $@
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/kernel/%.cpp | $(BUILD_DIR)
+$(BUILD_DIR)/cpp/%.o: $(SRC_DIR)/kernel/cpp/%.cpp | $(BUILD_DIR)
+	@mkdir -p $(dir $@)
 	@i386-elf-g++ $(CPPFLAGS) -c $< -o $@
 
 run: $(OS_IMAGE)
