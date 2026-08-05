@@ -16,6 +16,11 @@ extern "C" void main() {
     while (true) {
         char c = Keyboard::get_char();
 
+        if (c == '0') {
+            int x = 0;
+            int y = 1 / x;
+        }
+
         if (c != 0) {
             shell.print_char(c, fg_color);
         }
