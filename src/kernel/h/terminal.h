@@ -19,7 +19,7 @@ class Terminal {
 
         const FontInfo* const fontInfo = (const FontInfo*)0x7D90;
 
-        void draw_char(char c, int x, int y, uint8_t color);
+        void draw_char(char c, int x, int y, uint8_t color) const;
     public:
         Terminal(int tlx, int tly, int brx, int bry, uint8_t fg_color, uint8_t bg_color);
 
@@ -27,8 +27,8 @@ class Terminal {
 
         void write(const char* string, uint8_t color);
 
-        int get_cy();
-        uint8_t get_fg();
+        int get_cy() const;
+        uint8_t get_fg() const;
 
         void clear();
 
