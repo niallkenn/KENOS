@@ -2,7 +2,7 @@
 #include "screen.h"
 
 Terminal::Terminal(int tlx, int tly, int brx, int bry, uint8_t fg_color, uint8_t bg_color) : 
-    tlx(tlx), tly(tly), brx(brx), bry(bry), fg_color(fg_color), bg_color(bg_color) {
+     tlx(tlx), tly(tly), brx(brx), bry(bry), fg_color(fg_color), bg_color(bg_color) {
         clear();
 }
 
@@ -46,11 +46,11 @@ void Terminal::put_char(char c, uint8_t color) {
         cx = tlx;
     }
     
-    draw_char(c, cx, cy, color);
+    draw_char(c, cx, cy);
     cx+=8;
 }
 
-void Terminal::draw_char(char c, int x, int y, uint8_t color) const {
+void Terminal::draw_char(char c, int x, int y) const {
     if (x < tlx || (x + 8) > brx || y < tly || (y + 8) > bry) return;
 
     uint32_t fontBase = ((uint32_t)fontInfo->segment * 16) + fontInfo->offset;

@@ -15,6 +15,7 @@ void Idt::set_gate(size_t index, uint32_t handler_address, uint16_t selector, ui
 
 void Idt::initialize() {
     set_gate(0, (uint32_t)isr0, 0x08, 0x8E);
+    set_gate(14, (uint32_t)isr14, 0x08, 0x8E);
 
     IDTR idtr;
     idtr.limit = sizeof(idt) - 1;

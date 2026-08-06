@@ -3,6 +3,7 @@
 #include "definitions.h"
 
 extern "C" void isr0();
+extern "C" void isr14();
 
 class Idt {
     private:
