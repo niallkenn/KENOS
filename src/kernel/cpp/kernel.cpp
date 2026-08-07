@@ -13,25 +13,24 @@ extern "C" void main() {
     Terminal t(5, 5, 315, 195, LIGHT_GREY, BLACK);
     Shell s(t);
 
+    
     while (true) {
         char c = Keyboard::get_char();
-
+        
         if (c == 0) continue;
-
+        
         if (c == '\b') {
             s.handle_backspace();
             continue;
         }
-
+        
         if (c == '\n') {
             s.handle_enter();
             continue;
         }
-
+        
         if (c == '0') {
-            int x = 0;
-            int y = 5/x;
-            x = y;
+            asm volatile("ud2");
         }
 
         t.put_char(c);

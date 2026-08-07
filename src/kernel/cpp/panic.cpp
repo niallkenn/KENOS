@@ -21,10 +21,10 @@ void panic(const char* message, Registers* regs) {
         t.write(message);
         t.write("\n\nInterrupt:         ");
         t.write_uint(number);
-        t.write("\n\nEIP:               ");
-        t.write_hex(regs->eip);
         t.write("\nError Code:        ");
         t.write_hex(regs->error_code);
+        t.write("\n\nEIP:               ");
+        t.write_hex(regs->eip);
     }
     
 
