@@ -23,12 +23,13 @@ class Terminal {
     public:
         Terminal(int tlx, int tly, int brx, int bry,  uint8_t fg_color, uint8_t bg_color);
 
-        void put_char(char c, uint8_t color);
+        void put_char(char c);
 
-        void write(const char* string, uint8_t color);
+        void write(const char* string);
+        void write_uint(uint32_t number);
+        void write_hex(uint32_t number);
 
         int get_cy() const;
-        uint8_t get_fg() const;
 
         void clear();
 

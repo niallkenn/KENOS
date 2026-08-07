@@ -5,9 +5,7 @@
 
 class Shell {
     private:
-        Terminal& terminal;
-
-        int last_arrow_y;    
+        Terminal& terminal;   
     public:
         Shell(Terminal& terminal);
 

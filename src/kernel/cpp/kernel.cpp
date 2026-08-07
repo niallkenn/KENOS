@@ -34,6 +34,6 @@ extern "C" void main() {
             x = y;
         }
 
-        t.put_char(c, t.get_fg());
+        t.put_char(c);
     }
 }

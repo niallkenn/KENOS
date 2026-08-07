@@ -8,11 +8,9 @@ void Shell::handle_backspace() {
 
 void Shell::handle_enter() {
     terminal.new_line();
-    terminal.put_char('>', terminal.get_fg());
-    last_arrow_y = terminal.get_cy();
+    terminal.put_char('>');
 }
 
 Shell::Shell(Terminal& terminal) : terminal(terminal){
-    terminal.put_char('>', terminal.get_fg());
-    last_arrow_y = terminal.get_cy();
+    terminal.put_char('>');
 }

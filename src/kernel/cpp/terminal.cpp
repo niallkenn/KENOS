@@ -14,7 +14,7 @@ void Terminal::backspace()
     if (cx == tlx)
     {
         cy -= 8;
-        cx = (((320 - 2 * tlx) / 8) * 8) + tlx;
+        cx = tlx + ((brx - tlx) / 8 - 1) * 8;
     }
     else
     {
@@ -28,7 +28,7 @@ void Terminal::backspace()
     }
 }
 
-void Terminal::put_char(char c, uint8_t color) {
+void Terminal::put_char(char c) {
     if (c == '\n') {
         cy+=8;
         cx=tlx;
@@ -36,8 +36,8 @@ void Terminal::put_char(char c, uint8_t color) {
     }
 
     if (c == '\t') {
-        put_char(' ', color);
-        put_char(' ', color);
+        put_char(' ');
+        put_char(' ');
         return;
     }
 
@@ -70,12 +70,47 @@ void Terminal::draw_char(char c, int x, int y) const {
     }
 }
 
-void Terminal::write(const char* string, uint8_t color) {
+void Terminal::write(const char* string) {
     int index = 0;
     while (string[index]) {
-        put_char(string[index], color);
+        put_char(string[index]);
         index++;
     }
+}
+
+void Terminal::write_uint(uint32_t number) {
+    char buffer[11];
+
+    int i = 10;
+    buffer[i] = '\0';
+
+    if (number == 0) {
+        write("0");
+        return;
+    }
+
+    while (number > 0) {
+        i--;
+        buffer[i] = '0' + (number % 10);
+        number /= 10;
+    }
+
+    write(&buffer[i]);
+}
+
+void Terminal::write_hex(uint32_t number) {
+    const char* hex_chars = "0123456789ABCDEF";
+
+    char buffer[9];
+    buffer[8] = '\0';
+
+    for (int i = 7; i >= 0; --i) {
+        buffer[i] = hex_chars[number & 0xF];
+        number >>= 4;
+    }
+
+    write("0x");
+    write(buffer);
 }
 
 void Terminal::clear() {
@@ -89,8 +124,6 @@ void Terminal::clear() {
     }
 }
 
-void Terminal::new_line() { put_char('\n', fg_color);}
+void Terminal::new_line() { put_char('\n');}
 
 int Terminal::get_cy() const { return cy;}
-
-uint8_t Terminal::get_fg() const { return fg_color;}
