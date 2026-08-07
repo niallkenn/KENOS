@@ -2,6 +2,8 @@
 
 #include "definitions.h"
 
+void enable_interrupts();
+
 struct __attribute__((packed)) Registers {
     uint32_t gs;
     uint32_t fs;

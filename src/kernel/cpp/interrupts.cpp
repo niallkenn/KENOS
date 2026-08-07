@@ -37,9 +37,24 @@ const char* exception_messages[32] =
     "Reserved"
 };
 
+void enable_interrupts() {
+    asm volatile("sti");
+}
+
 extern "C" void interrupt_handler(Registers* regs) {
-    if (regs->interrupt_number < 32) {
-        panic(exception_messages[regs->interrupt_number], regs);
+    uint32_t number = regs->interrupt_number;
+    if (number < 32) {
+        panic(exception_messages[number], regs);
+    } else if (number >= 32 && number <= 47) {
+        switch (number)
+        {
+        case 3:
+            
+            break;
+        
+        default:
+            break;
+        }
     } else {
         panic("Unhandled or Reserved Exception Induced\n", regs);
     }
