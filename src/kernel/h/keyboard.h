@@ -9,8 +9,10 @@ class Keyboard {
 
         static uint8_t last_scancode;
 
+        
     public:
+        static void set_shell(Shell* shell);
+        Keyboard() = delete;
+        static Shell* active_shell;
         static char get_char();
 };
-
-void handle_enter(Shell& shell);

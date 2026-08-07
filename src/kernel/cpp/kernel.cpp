@@ -17,10 +17,12 @@ extern "C" void main() {
 
     uint32_t pit_frequency = 100;
     Pit::initialize(pit_frequency);
-
+    
     Terminal t(5, 5, 315, 195, LIGHT_GREY, BLACK);
     Shell s(t);
     
+    Keyboard::set_shell(&s);
+
     enable_interrupts();
 
     while (1) {

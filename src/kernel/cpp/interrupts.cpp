@@ -52,7 +52,10 @@ extern "C" void interrupt_handler(Registers* regs) {
         {
         case 32:
             handle_irq0();
-            Pic::send_eoi(0);
+            break;
+
+        case 33:
+            handle_irq1();
             break;
         
         default:

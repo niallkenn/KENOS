@@ -14,3 +14,11 @@ void Shell::handle_enter() {
 Shell::Shell(Terminal& terminal) : terminal(terminal){
     terminal.put_char('>');
 }
+
+void Shell::print_char(char c) {
+    terminal.put_char(c);
+}
+
+void Shell::print(const char* string) {
+    terminal.write(string);
+}

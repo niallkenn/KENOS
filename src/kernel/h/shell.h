@@ -9,6 +9,9 @@ class Shell {
     public:
         Shell(Terminal& terminal);
 
+        void print_char(char c);
+        void print(const char* string);
+
         void handle_enter();
         void handle_backspace();
 };
