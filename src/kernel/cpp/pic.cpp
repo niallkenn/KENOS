@@ -4,6 +4,7 @@ constexpr uint16_t PIC1_COMMAND = 0x20;
 constexpr uint16_t PIC1_DATA    = 0x21;
 constexpr uint16_t PIC2_COMMAND = 0xA0;
 constexpr uint16_t PIC2_DATA    = 0xA1;
+constexpr uint8_t PIC_EOI = 0x20;
 
 inline uint8_t inb(uint16_t port) {
     return PortIO::inb(port);
@@ -45,4 +46,10 @@ void Pic::initialize() {
     io_wait();
     outb(PIC2_DATA, slave_mask);
     io_wait();
+}
+
+void Pic::send_eoi(uint8_t irq) {
+    if (irq >= 8) outb(PIC2_COMMAND, PIC_EOI);
+
+    outb(PIC1_COMMAND, PIC_EOI);
 }

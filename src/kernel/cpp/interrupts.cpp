@@ -1,5 +1,7 @@
 #include "interrupts.h"
 #include "panic.h"
+#include "irqhandlers.h"
+#include "pic.h"
 
 const char* exception_messages[32] =
 {
@@ -48,8 +50,9 @@ extern "C" void interrupt_handler(Registers* regs) {
     } else if (number >= 32 && number <= 47) {
         switch (number)
         {
-        case 3:
-            
+        case 32:
+            handle_irq0();
+            Pic::send_eoi(0);
             break;
         
         default:
