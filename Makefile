@@ -6,6 +6,7 @@ LINKER_SCRIPT = $(SRC_DIR)/linker.ld
 
 BOOT_BIN   = $(BUILD_DIR)/boot.bin
 KERNEL_BIN = $(BUILD_DIR)/kernel.bin
+KERNEL_INFO = $(BUILD_DIR)/kernel_info.asm
 OS_IMAGE   = $(BUILD_DIR)/os_image.bin
 
 ASM_SRCS = $(wildcard $(SRC_DIR)/kernel/asm/*.asm)
@@ -25,13 +26,21 @@ $(BUILD_DIR):
 
 $(OS_IMAGE): $(BOOT_BIN) $(KERNEL_BIN) | $(BUILD_DIR)
 	@cat $(BOOT_BIN) $(KERNEL_BIN) > $(OS_IMAGE)
-	@truncate -s 8192 $(OS_IMAGE)
+	@SIZE=$$(stat -c%s $(OS_IMAGE)); \
+	PAD=$$(( (512 - (SIZE % 512)) % 512 )); \
+	truncate -s $$((SIZE + PAD)) $(OS_IMAGE)
 
-$(BOOT_BIN): $(BOOT_SRC) | $(BUILD_DIR)
+$(BOOT_BIN): $(BOOT_SRC) $(KERNEL_INFO) | $(BUILD_DIR)
 	@nasm -f bin $(BOOT_SRC) -o $(BOOT_BIN)
 
 $(KERNEL_BIN): $(ALL_OBJS) $(LINKER_SCRIPT) | $(BUILD_DIR)
 	@i386-elf-ld -m elf_i386 -nostdlib -T $(LINKER_SCRIPT) $(ALL_OBJS) -o $(KERNEL_BIN) --oformat binary
+
+$(KERNEL_INFO) : $(KERNEL_BIN)
+	@KERNEL_SIZE=$$(stat -c%s $(KERNEL_BIN)); \
+	KERNEL_SECTORS=$$(( (KERNEL_SIZE + 511) / 512 )); \
+	echo "KERNEL_SIZE equ $$KERNEL_SIZE" > $(KERNEL_INFO); \
+	echo "KERNEL_SECTORS equ $$KERNEL_SECTORS" >> $(KERNEL_INFO)
 
 $(BUILD_DIR)/asm/%.o: $(SRC_DIR)/kernel/asm/%.asm | $(BUILD_DIR)
 	@mkdir -p $(dir $@)

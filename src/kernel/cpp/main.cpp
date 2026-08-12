@@ -3,7 +3,6 @@
 #include "portio.h"
 #include "screen.h"
 #include "shell.h"
-#include "memoryallocator.h"
 #include "idt.h"
 #include "terminal.h"
 #include "pic.h"

@@ -1,7 +1,9 @@
 [org 0x7c00]                    ; tell nasm bios loads at address 0x7c00
 [bits 16]                       ; start cpu in 16 bit real mode
 
-KERNEL_OFFSET equ 0x1000        ; kernel entry start point
+%include "build/kernel_info.asm"
+
+KERNEL_LOAD_ADDRESS equ 0x1000        ; kernel entry start point
 
 .bootloader_start:
     mov [BOOT_DRIVE_NUMBER], dl ; save boot drive number passed to dl by bios
@@ -39,20 +41,19 @@ KERNEL_OFFSET equ 0x1000        ; kernel entry start point
 
 load_kernel:
     mov ah, 2
-    mov al, 15
+    mov al, KERNEL_SECTORS
     mov ch, 0
     mov cl, 2
     mov dh, 0
     mov dl, [BOOT_DRIVE_NUMBER]
-    mov bx, KERNEL_OFFSET
+    mov bx, KERNEL_LOAD_ADDRESS 
 
     int 0x13
 
     ; handle disk read errors
     jc handle_disk_error    
-    cmp al, 15
+    cmp al, KERNEL_SECTORS
     jne handle_disk_error
-
     ret
 
 handle_disk_error:
@@ -108,7 +109,7 @@ start_protected_mode:
     mov ebp, 0x90000
     mov esp, ebp
 
-    jmp KERNEL_OFFSET
+    jmp KERNEL_LOAD_ADDRESS
 
 times 400-($-$$) db 0
 
