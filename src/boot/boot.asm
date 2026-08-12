@@ -4,7 +4,6 @@
 %include "build/kernel_info.asm"
 
 KERNEL_LOAD_ADDRESS equ 0x1000        ; kernel entry start point
-MEMORY_MAP_BUFFER equ 0x8000
 MEMORY_MAP_ENTRY_COUNT equ 0x8C00
 
 .bootloader_start:
@@ -47,7 +46,7 @@ MEMORY_MAP_ENTRY_COUNT equ 0x8C00
     jmp $                       ; keep jmp here (do not excecute functions past here)
 
 do_e820:
-    mov di, 0x8004
+    mov di, 0x8000
     xor ebx, ebx
     xor si, si
     mov edx, 0x0534D4150

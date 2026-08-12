@@ -15,6 +15,6 @@ class MemoryMap {
 
         static void initialize();
 
-        static MemoryMapEntry* map_entries;
-        static uint16_t map_count;
+        static MemoryMapEntry* entries();
+        static uint16_t count();
 };
