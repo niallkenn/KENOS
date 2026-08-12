@@ -4,6 +4,8 @@
 %include "build/kernel_info.asm"
 
 KERNEL_LOAD_ADDRESS equ 0x1000        ; kernel entry start point
+MEMORY_MAP_BUFFER equ 0x8000
+MEMORY_MAP_ENTRY_COUNT equ 0x8C00
 
 .bootloader_start:
     mov [BOOT_DRIVE_NUMBER], dl ; save boot drive number passed to dl by bios
@@ -35,10 +37,61 @@ KERNEL_LOAD_ADDRESS equ 0x1000        ; kernel entry start point
     mov [FONT_OFFSET], bp       ; Save the offset
     pop es                      ; Restore ES register
 
+    ; memory map
+
+    call do_e820
+    mov [MEMORY_MAP_ENTRY_COUNT], si
+
     call load_kernel
     call switch_pm
     jmp $                       ; keep jmp here (do not excecute functions past here)
 
+do_e820:
+    mov di, 0x8004
+    xor ebx, ebx
+    xor si, si
+    mov edx, 0x0534D4150
+first_entry:
+    mov eax, 0xE820
+    mov ecx, 24
+    int 0x15
+
+    jc failed_e820
+    mov edx, 0x0534D4150
+    cmp eax, edx
+    jne failed_e820
+    jmp handle_entry
+loop_e820:
+    mov eax, 0xE820
+    mov edx, 0x534D4150
+    mov ecx, 24
+
+    int 0x15
+
+    jc done_e820
+
+    cmp eax, 0x534D4150
+    jne failed_e820
+
+    add di, 24
+    inc si
+    
+    cmp ebx, 0
+    jne loop_e820
+    jmp done_e820
+handle_entry:
+    add di, 24
+    inc si
+    
+    cmp ebx, 0
+    jne loop_e820
+    jmp done_e820
+failed_e820:
+    stc
+    ret
+done_e820:
+    clc
+    ret
 load_kernel:
     mov ah, 2
     mov al, KERNEL_SECTORS
