@@ -25,13 +25,6 @@ extern "C" void main() {
 
     enable_interrupts();
 
-    for (size_t i=0;i<MemoryMap::count();i++) {
-        t.write_hex(MemoryMap::entries()[i].base);
-        t.write("  ");
-        t.write_hex(MemoryMap::entries()[i].length);
-        t.new_line();
-    }
-
     while (1) {
         asm volatile("hlt");
     }
