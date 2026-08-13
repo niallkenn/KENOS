@@ -36,3 +36,7 @@ enum VgaColor : uint8_t {
     WHITE         = 15
 };
 
+extern "C" {
+    extern uint32_t _kernel_end[];
+    extern uint32_t _kernel_start[];
+}

@@ -2,23 +2,28 @@ ENTRY(.start)
 
 SECTIONS
 {
-    . = 0x1000;
+    /* Load the kernel safely at the 1MB mark to avoid BIOS data areas */
+    . = 0x9000; 
+    _kernel_start = .;
 
-    .text : {
+    /* Force every section to align to a clean 4KB page boundary */
+    .text : ALIGN(4K) {
         *(.text.start)
         *(.text)
     }
 
-    .rodata : {
+    .rodata : ALIGN(4K) {
         *(.rodata*)
     }
 
-    .data : {
+    .data : ALIGN(4K) {
         *(.data)
     }
 
-    .bss : {
-        *(COMMON)
+    .bss : ALIGN(4K) {
+        *(.COMMON)
         *(.bss)
     }
+
+    _kernel_end = .;
 }

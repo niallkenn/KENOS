@@ -3,7 +3,7 @@
 
 %include "build/kernel_info.asm"
 
-KERNEL_LOAD_ADDRESS equ 0x1000        ; kernel entry start point
+KERNEL_LOAD_ADDRESS equ 0x9000        ; kernel entry start point
 MEMORY_MAP_ENTRY_COUNT equ 0x8C00
 
 .bootloader_start:

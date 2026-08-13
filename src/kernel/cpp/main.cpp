@@ -7,6 +7,7 @@
 #include "interrupts.h"
 #include "pit.h"
 #include "memorymap.h"
+#include "frameallocator.h"
 
 extern "C" void main() {
     Idt::initialize();
@@ -17,6 +18,8 @@ extern "C" void main() {
     Pit::initialize(pit_frequency);
 
     MemoryMap::initialize();
+
+    FrameAllocator::initialise();
     
     Terminal t(5, 5, 315, 195, LIGHT_GREY, BLACK);
     Shell s(t);
