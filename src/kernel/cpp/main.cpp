@@ -8,6 +8,7 @@
 #include "pit.h"
 #include "memorymap.h"
 #include "frameallocator.h"
+#include "paging.h"
 
 extern "C" void main() {
     Idt::initialize();
@@ -20,6 +21,8 @@ extern "C" void main() {
     MemoryMap::initialize();
 
     FrameAllocator::initialise();
+
+    Paging::initialise();
     
     Terminal t(5, 5, 315, 195, LIGHT_GREY, BLACK);
     Shell s(t);
@@ -27,6 +30,7 @@ extern "C" void main() {
     Keyboard::set_shell(&s);
 
     enable_interrupts();
+
 
     while (1) {
         asm volatile("hlt");

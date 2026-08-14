@@ -1,5 +1,8 @@
 #pragma once
 
+#define PRESENT 0x1
+#define WRITABLE 0x2
+
 typedef unsigned char      uint8_t;
 typedef unsigned short     uint16_t;
 typedef unsigned int       uint32_t;
