@@ -9,15 +9,22 @@ KERNEL_BIN = $(BUILD_DIR)/kernel.bin
 KERNEL_INFO = $(BUILD_DIR)/kernel_info.asm
 OS_IMAGE   = $(BUILD_DIR)/os_image.bin
 
-ASM_SRCS = $(wildcard $(SRC_DIR)/kernel/asm/*.asm)
-CPP_SRCS = $(wildcard $(SRC_DIR)/kernel/cpp/*.cpp)
+ASM_SRCS := $(shell find $(SRC_DIR) -type f -name '*.asm' ! -path '$(SRC_DIR)/boot/boot.asm')
+CPP_SRCS := $(shell find $(SRC_DIR) -type f -name '*.cpp')
 
-ASM_OBJS = $(patsubst $(SRC_DIR)/kernel/asm/%.asm, $(BUILD_DIR)/asm/%.o, $(ASM_SRCS))
-CPP_OBJS = $(patsubst $(SRC_DIR)/kernel/cpp/%.cpp, $(BUILD_DIR)/cpp/%.o, $(CPP_SRCS))
+ASM_OBJS = $(patsubst $(SRC_DIR)/%.asm, $(BUILD_DIR)/asm/%.o, $(ASM_SRCS))
+CPP_OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/cpp/%.o, $(CPP_SRCS))
 
 ALL_OBJS = $(ASM_OBJS) $(CPP_OBJS)
 
-CPPFLAGS = -m32 -ffreestanding -fno-pie -fno-rtti -fno-exceptions -Wall -Wextra -I$(SRC_DIR)/kernel/h
+CPPFLAGS = -m32 -ffreestanding -fno-pie -fno-rtti -fno-exceptions -Wall -Wextra \
+		-I$(SRC_DIR) \
+	    -I$(SRC_DIR)/sys \
+		-I$(SRC_DIR)/drivers \
+		-I$(SRC_DIR)/shell \
+		-I$(SRC_DIR)/memory \
+		-I$(SRC_DIR)/interrupts \
+		-I$(SRC_DIR)/boot
 
 all: $(OS_IMAGE)
 
@@ -42,11 +49,11 @@ $(KERNEL_INFO) : $(KERNEL_BIN)
 	echo "KERNEL_SIZE equ $$KERNEL_SIZE" > $(KERNEL_INFO); \
 	echo "KERNEL_SECTORS equ $$KERNEL_SECTORS" >> $(KERNEL_INFO)
 
-$(BUILD_DIR)/asm/%.o: $(SRC_DIR)/kernel/asm/%.asm | $(BUILD_DIR)
+$(BUILD_DIR)/asm/%.o: $(SRC_DIR)/%.asm | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
 	@nasm -f elf32 $< -o $@
 
-$(BUILD_DIR)/cpp/%.o: $(SRC_DIR)/kernel/cpp/%.cpp | $(BUILD_DIR)
+$(BUILD_DIR)/cpp/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
 	@i386-elf-g++ $(CPPFLAGS) -c $< -o $@
 
