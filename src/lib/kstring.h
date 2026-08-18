@@ -2,14 +2,15 @@
 
 #include "definitions.h"
 
+size_t strlen(const char* str);
+void memcpy(char* dst, const char* src, size_t n);
+
 class kString {
     private:
         char* m_data;
         size_t m_size;
         size_t m_capacity;
 
-        size_t strlen(const char* str) const;
-        void memcpy(char* dst, char* src, size_t n);
 
     public:
         kString();

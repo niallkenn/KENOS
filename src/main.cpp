@@ -10,6 +10,7 @@
 #include "frameallocator.h"
 #include "paging.h"
 #include "heapallocator.h"
+#include "kstring.h"
 
 extern "C" void main() {
     Idt::initialize();
