@@ -27,4 +27,16 @@ class HeapAllocator {
 
         static void* kmalloc(size_t size);
         static void kfree(void* ptr);
-};  
+};
+
+void* kmalloc(size_t size);
+void kfree(void* ptr);
+
+void* operator new(size_t size);
+void* operator new[](size_t size);
+
+void operator delete(void* ptr) noexcept;
+void operator delete[](void* ptr) noexcept;
+
+void operator delete(void* ptr, size_t) noexcept;
+void operator delete[](void* ptr, size_t) noexcept;

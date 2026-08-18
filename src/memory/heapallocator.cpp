@@ -1,6 +1,7 @@
 #include "heapallocator.h"
 #include "frameallocator.h"
 #include "paging.h"
+#include "panic.h"
 
 Block* HeapAllocator::m_head = nullptr;
 uintptr_t HeapAllocator::m_heap_start = HeapAllocator::HEAP_START;
@@ -9,7 +10,7 @@ size_t HeapAllocator::m_heap_size = HeapAllocator::INITIAL_HEAP_SIZE;
 void HeapAllocator::initialise() {
     size_t page_count = (INITIAL_HEAP_SIZE + 4095) / 4096;
 
-    for (int i = 0; i < page_count; i++) {
+    for (size_t i = 0; i < page_count; i++) {
         uint32_t frame = reinterpret_cast<uint32_t>(FrameAllocator::allocate());
         Paging::map_page(HEAP_START + i * 0x1000, frame, 0x3);
     }
@@ -88,4 +89,42 @@ void HeapAllocator::kfree(void* ptr) {
             previous->next = previous->next->next;
         }
     }
+}
+
+void* kmalloc(size_t size) {
+    void* ptr = HeapAllocator::kmalloc(size);
+
+    if (ptr == nullptr) {
+        panic("kmalloc: allocation failed");
+    }
+
+    return ptr;
+}
+
+void kfree(void* ptr) {
+    HeapAllocator::kfree(ptr);
+}
+
+void* operator new(size_t size) {
+    return kmalloc(size);
+}
+
+void* operator new[](size_t size) {
+    return kmalloc(size);
+}
+
+void operator delete(void* ptr) noexcept {
+    kfree(ptr);
+}
+
+void operator delete[](void* ptr) noexcept {
+    kfree(ptr);
+}
+
+void operator delete(void* ptr, size_t) noexcept {
+    kfree(ptr);
+}
+
+void operator delete[](void* ptr, size_t) noexcept {
+    kfree(ptr);
 }

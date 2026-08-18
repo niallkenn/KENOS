@@ -32,3 +32,17 @@ void panic(const char* message, Registers* regs) {
 
     while (true) asm volatile("hlt");
 }
+
+void panic(const char* message) {
+    asm volatile("cli");
+
+    uint8_t color = 40;
+    Terminal t(5, 5, 315, 195, WHITE, color);
+    Screen::clear_screen(color);
+
+    t.write("              KERNEL PANIC\n\n\n");
+    t.write(message);
+    t.write("\n\n\nSystem halted.");
+
+    while (true) asm volatile("hlt");
+}
