@@ -63,3 +63,29 @@ void* HeapAllocator::kmalloc(size_t size) {
 
     return reinterpret_cast<void*>(current + 1);
 }
+
+void HeapAllocator::kfree(void* ptr) {
+    if (ptr == nullptr) return;
+
+    Block* free_block = reinterpret_cast<Block*>(ptr) - 1;
+    
+    free_block->free = true;
+
+    if (free_block->next != nullptr && free_block->next->free == true) {
+        free_block->size += sizeof(Block) + free_block->next->size;
+        free_block->next = free_block->next->next;
+    }
+
+    Block* previous = m_head;
+
+    if (free_block != m_head) {
+        while (previous->next != free_block) {
+        previous = previous->next;
+        }
+
+        if (previous->free) {
+            previous->size += sizeof(Block) + previous->next->size;
+            previous->next = previous->next->next;
+        }
+    }
+}

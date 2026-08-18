@@ -27,10 +27,10 @@ extern "C" void main() {
 
     HeapAllocator::initialise();
     
-    Terminal t(5, 5, 315, 195, LIGHT_GREY, BLACK);
-    Shell s(t);
+    Terminal terminal(5, 5, 315, 195, LIGHT_GREY, BLACK);
+    Shell shell(terminal);
     
-    Keyboard::set_shell(&s);
+    Keyboard::set_shell(&shell);
 
     enable_interrupts();
 
