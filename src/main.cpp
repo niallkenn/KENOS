@@ -9,6 +9,7 @@
 #include "memorymap.h"
 #include "frameallocator.h"
 #include "paging.h"
+#include "heapallocator.h"
 
 extern "C" void main() {
     Idt::initialize();
@@ -23,6 +24,8 @@ extern "C" void main() {
     FrameAllocator::initialise();
 
     Paging::initialise();
+
+    HeapAllocator::initialise();
     
     Terminal t(5, 5, 315, 195, LIGHT_GREY, BLACK);
     Shell s(t);

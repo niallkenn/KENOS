@@ -14,6 +14,9 @@ class HeapAllocator {
         static uintptr_t m_heap_start;
         static size_t m_heap_size;
 
+        static constexpr uintptr_t HEAP_START = 0xC0000000;
+        static constexpr size_t INITIAL_HEAP_SIZE = 256 * 1024;
+
         HeapAllocator() = delete;
 
     public:
