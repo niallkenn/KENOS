@@ -21,3 +21,45 @@ void HeapAllocator::initialise() {
 
     m_head = first_block;
 }
+
+size_t HeapAllocator::align_up(size_t value, size_t alignment) {
+    return (value + alignment - 1) & ~(alignment - 1);
+}
+
+void* HeapAllocator::kmalloc(size_t size) {
+    if (m_head == nullptr || size == 0) return nullptr;
+
+    size = align_up(size, 8);
+
+    Block* current = m_head;
+
+    do {
+        if (current->free == false) {
+            current = current->next;
+            continue;
+        } else if (current->size < size) {
+            current = current->next;
+            continue;
+        } else {
+            if (current->size >= size + sizeof(Block) + MINIMUM_BLOCK_SIZE) {
+                Block* new_block = reinterpret_cast<Block*>(reinterpret_cast<uint8_t*>(current + 1) + size);
+
+                new_block->size = current->size - size - sizeof(Block);
+                new_block->free = true;
+                new_block->next = current->next;
+
+                current->size = size;
+                current->next = new_block;
+            }
+            
+            current->free = false;
+
+            break;
+        }
+
+    } while (current != nullptr);
+
+    if (current == nullptr) return nullptr;
+
+    return reinterpret_cast<void*>(current + 1);
+}
