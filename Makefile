@@ -24,7 +24,8 @@ CPPFLAGS = -m32 -ffreestanding -fno-pie -fno-rtti -fno-exceptions -Wall -Wextra 
 		-I$(SRC_DIR)/shell \
 		-I$(SRC_DIR)/memory \
 		-I$(SRC_DIR)/interrupts \
-		-I$(SRC_DIR)/boot
+		-I$(SRC_DIR)/boot \
+		-I$(SRC_DIR)/lib
 
 all: $(OS_IMAGE)
 
