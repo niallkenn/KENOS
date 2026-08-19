@@ -2,13 +2,18 @@
 #include "definitions.h"
 #include "screen.h"
 #include "terminal.h"
+#include "kvector.h"
+#include "kstring.h"
 
 class Shell {
     private:
-        Terminal& terminal;   
+    
     public:
+        kVector<kString> command_buffer;
+        Terminal& terminal;
+    
         Shell(Terminal& terminal);
-
+        
         void print_char(char c);
         void print(const char* string);
 
