@@ -18,11 +18,27 @@ void k_echo(Shell& shell) {
 }
 
 void k_help(Shell& shell) {
+    shell.terminal.new_line();
 
+    shell.terminal.write("\nabout: information about KENOS");
+    shell.terminal.write("\ncalc:  evaluate arithmetic expression");
+    shell.terminal.write("\nclear: clear the terminal");
+    shell.terminal.write("\necho:  print text");
+    shell.terminal.write("\nhelp:  list available commands");
+    shell.terminal.write("\nmem:   show memory information");
+
+    shell.terminal.new_line();
+    shell.terminal.new_line();
 }
 
 void k_mem(Shell& shell) {
     
+    shell.terminal.new_line();
+}
+
+void k_calc(Shell& shell) {
+
+    shell.terminal.new_line();
 }
 
 void k_about(Shell& shell) {
