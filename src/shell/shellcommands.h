@@ -4,5 +4,9 @@
 
 void k_clear(Shell& shell);
 void k_echo(Shell& shell);
+void k_help(Shell& shell);
+void k_about(Shell& shell);
+void k_mem(Shell& shell);
+
 
 void k_command_error(Shell& shell);

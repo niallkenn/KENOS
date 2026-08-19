@@ -17,6 +17,20 @@ void k_echo(Shell& shell) {
     shell.terminal.new_line();
 }
 
+void k_help(Shell& shell) {
+
+}
+
+void k_mem(Shell& shell) {
+    
+}
+
+void k_about(Shell& shell) {
+    shell.terminal.write("\n\nKENOS v1.0\n\n");
+    shell.terminal.write("A 32-bit x86 operating system\n");
+    shell.terminal.write("Built from scratch by\nThe Great, Young, Niall Kennedy\n\n");
+}
+
 void k_command_error(Shell& shell) {
     shell.terminal.write("\ncommand not found: ");
     shell.terminal.write(shell.command_buffer[0].c_str());
