@@ -1,13 +1,13 @@
 #include "kstring.h"
 #include "heapallocator.h"
 
-size_t strlen(const char* str) {
+size_t kString::strlen(const char* str) const {
     size_t len = 0;
     while (str[len] != '\0') len++;
     return len;
 }
 
-void memcpy(char* dst, const char* src, size_t n) {
+void kString::memcpy(char* dst, const char* src, size_t n) {
     for (size_t i = 0; i < n; i++) dst[i] = src[i];
 }
 
@@ -126,7 +126,8 @@ void kString::clear() {
 }
 
 bool kString::equalTo(const char* str) const {
-    if (m_size != strlen(str)) return false;
+    size_t len = strlen(str);
+    if (m_size != len) return false;
 
     for (size_t i = 0; i < m_size; i++) if (m_data[i] != str[i]) return false;
 
