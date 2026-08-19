@@ -11,6 +11,7 @@
 #include "paging.h"
 #include "heapallocator.h"
 #include "kstring.h"
+#include "kvector.h"
 
 extern "C" void main() {
     Idt::initialize();
