@@ -27,6 +27,7 @@ void Shell::handle_enter() {
     else if (command_buffer[0].equalTo("about")) k_about(*this);
     else if (command_buffer[0].equalTo("mem")) k_mem(*this);
     else if (command_buffer[0].equalTo("alloc")) k_alloc(*this);
+    else if (command_buffer[0].equalTo("calc")) k_calc(*this);
     else if (command_buffer[0].equalTo("panic")) k_panic();
     
     else k_command_error(*this);

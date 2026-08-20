@@ -156,6 +156,34 @@ void k_mem(Shell& shell) {
 }
 
 void k_calc(Shell& shell) {
+    shell.terminal.new_line();
+    if (shell.command_buffer.size() != 4) {
+        shell.terminal.write("calc: invalid input");
+    } else {
+        if (shell.command_buffer[1].isNumber() && shell.command_buffer[3].isNumber()) {
+            int result = __INT_MAX__;
+            if (shell.command_buffer[2].equalTo("+")) {
+                result = shell.command_buffer[1].toInt() + shell.command_buffer[3].toInt();
+            } else if (shell.command_buffer[2].equalTo("-")) {
+                result = shell.command_buffer[1].toInt() - shell.command_buffer[3].toInt();
+            } else if (shell.command_buffer[2].equalTo("*")) {
+                result = shell.command_buffer[1].toInt() * shell.command_buffer[3].toInt();
+            } else if (shell.command_buffer[2].equalTo("/")) {
+                result = shell.command_buffer[1].toInt() / shell.command_buffer[3].toInt();
+            } else {
+                shell.terminal.write("calc: invalid input");
+            }
+
+            if (result != __INT_MAX__) {
+                if (result < 0) {
+                    shell.terminal.put_char('-');
+                    shell.terminal.write_uint(-result);
+                } else shell.terminal.write_uint(result);
+            }
+        } else {
+            shell.terminal.write("calc: invalid input");
+        }
+    }
 
     shell.terminal.new_line();
 }

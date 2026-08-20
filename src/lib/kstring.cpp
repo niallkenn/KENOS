@@ -138,13 +138,34 @@ bool kString::equalTo(const kString& other) const {
     return equalTo(other.c_str());
 }
 
-uint32_t kString::toInt() {
+uint32_t kString::toInt() const {
     uint32_t result = 0;
-    for (size_t i = 0; i < strlen(m_data); i++) {
+    size_t start = 0;
+
+    if (m_data[0] == '-') {
+        start = 1;
+    }
+
+    for (size_t i = start; i < strlen(m_data); i++) {
         if (m_data[i] < '0' || m_data[i] > '9') return __UINT32_MAX__;
 
         result = (result * 10) + (m_data[i] - '0');
     }
 
+    if (start == 1) result = -result;
+
     return result;
+}
+
+bool kString::isNumber() const {
+    size_t start = 0;
+    if (m_data[0] == '-') {
+        start = 1;
+    }
+
+    for (size_t i = start; i < m_size; i++) {
+        if (m_data[i] < '0' || m_data[i] > '9') return false;
+    }
+
+    return true;
 }
