@@ -11,12 +11,14 @@ bool FrameAllocator::is_frame_set(uint32_t frame) {
 }
 
 void FrameAllocator::set_frame(uint32_t frame) {
+    if (is_frame_set(frame)) return;
     m_bitmap[frame / 8] |= (1 << (frame % 8));
     m_used_frames++;
     if (m_free_frames!=0) m_free_frames--;
 }
 
 void FrameAllocator::clear_frame(uint32_t frame) {
+    if (!is_frame_set(frame)) return;
     m_bitmap[frame / 8] &= ~(1 << (frame % 8));
     m_free_frames++;
     if (m_used_frames!=0) m_used_frames--;
@@ -47,13 +49,18 @@ void FrameAllocator::bump_index() {
 void FrameAllocator::initialise() {
     uint64_t total_memory_bytes = 0;
     for (size_t i = 0; i < MemoryMap::count(); i++) {
-        uint64_t entry_end = MemoryMap::entries()[i].base + MemoryMap::entries()[i].length;
+        MemoryMapEntry& e = MemoryMap::entries()[i];
+
+        if (e.type != 1) continue;
+
+        uint64_t entry_end = e.base + e.length;
 
         if (entry_end > total_memory_bytes) total_memory_bytes = entry_end;
     }
 
-    m_total_frames = total_memory_bytes / PAGE_SIZE;
-    m_free_frames = m_total_frames;
+    m_total_frames = (total_memory_bytes + PAGE_SIZE - 1) / PAGE_SIZE;
+    m_used_frames = m_total_frames;
+    m_free_frames = 0;
 
     for (size_t i = 0; i < FrameAllocator::MAX_BITMAP_SIZE; i++) m_bitmap[i] = 0b11111111;
 

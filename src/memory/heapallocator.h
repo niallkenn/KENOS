@@ -22,7 +22,10 @@ class HeapAllocator {
     static size_t align_up(size_t val, size_t alignment);
     
     public:
-    static Block* m_head;
+        static Block* m_head;
+        static size_t m_total_used;
+        static size_t m_total_free;
+        static size_t m_block_count;
         static void initialise();
 
         static void* kmalloc(size_t size);

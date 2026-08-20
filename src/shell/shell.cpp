@@ -20,11 +20,15 @@ void Shell::handle_backspace() {
 
 void Shell::handle_enter() {
     if (command_buffer[0].isEmpty()) terminal.new_line();
+    
     else if (command_buffer[0].equalTo("clear")) k_clear(*this);
     else if (command_buffer[0].equalTo("echo")) k_echo(*this);
     else if (command_buffer[0].equalTo("help")) k_help(*this);
     else if (command_buffer[0].equalTo("about")) k_about(*this);
     else if (command_buffer[0].equalTo("mem")) k_mem(*this);
+    else if (command_buffer[0].equalTo("alloc")) k_alloc(*this);
+    else if (command_buffer[0].equalTo("panic")) k_panic();
+    
     else k_command_error(*this);
 
     command_buffer.clear();

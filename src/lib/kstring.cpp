@@ -137,3 +137,14 @@ bool kString::equalTo(const char* str) const {
 bool kString::equalTo(const kString& other) const {
     return equalTo(other.c_str());
 }
+
+uint32_t kString::toInt() {
+    uint32_t result = 0;
+    for (size_t i = 0; i < strlen(m_data); i++) {
+        if (m_data[i] < '0' || m_data[i] > '9') return __UINT32_MAX__;
+
+        result = (result * 10) + (m_data[i] - '0');
+    }
+
+    return result;
+}

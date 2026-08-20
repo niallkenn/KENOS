@@ -32,6 +32,8 @@ class kString {
         bool equalTo(const kString& str) const;
         bool equalTo(const char* str) const;
 
+        uint32_t toInt();
+
         bool isEmpty() const { return m_size == 0; }
         const char* c_str() const { return m_data; }
         size_t size() const { return m_size; }

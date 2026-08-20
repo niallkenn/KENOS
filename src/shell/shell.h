@@ -9,8 +9,8 @@ class Shell {
     private:
     
     public:
-        kVector<kString> command_buffer;
         Terminal& terminal;
+        kVector<kString> command_buffer;
     
         Shell(Terminal& terminal);
         
