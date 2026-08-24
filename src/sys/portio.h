@@ -24,4 +24,27 @@ class PortIO {
             );
             return result;
         }
+
+        static inline uint16_t inw(uint16_t port) {
+            uint16_t result;
+
+            asm volatile(
+                "inw %w1, %w0"
+                : "=a"(result)
+                : "Nd"(port)
+                : "memory"
+            );
+
+            return result;
+        }
+
+        static inline void outw(uint16_t port, uint16_t value) {
+            asm volatile(
+                "outw %w0, %w1"
+                :
+                : "a"(value),
+                  "Nd"(port)
+                : "memory"
+            );
+        }
 };
