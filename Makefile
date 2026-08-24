@@ -11,6 +11,7 @@ OS_IMAGE   = $(BUILD_DIR)/os_image.bin
 
 ASM_SRCS := $(shell find $(SRC_DIR) -type f -name '*.asm' ! -path '$(SRC_DIR)/boot/boot.asm')
 CPP_SRCS := $(shell find $(SRC_DIR) -type f -name '*.cpp')
+DISK_IMAGE := build/disk.img
 
 ASM_OBJS = $(patsubst $(SRC_DIR)/%.asm, $(BUILD_DIR)/asm/%.o, $(ASM_SRCS))
 CPP_OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/cpp/%.o, $(CPP_SRCS))
@@ -50,6 +51,11 @@ $(KERNEL_INFO) : $(KERNEL_BIN)
 	echo "KERNEL_SIZE equ $$KERNEL_SIZE" > $(KERNEL_INFO); \
 	echo "KERNEL_SECTORS equ $$KERNEL_SECTORS" >> $(KERNEL_INFO)
 
+disk:
+	@if [ ! -f "$(DISK_IMAGE)" ]; then \
+		dd if=/dev/zero of="$(DISK_IMAGE)" bs=1M count=64; \
+	fi
+
 $(BUILD_DIR)/asm/%.o: $(SRC_DIR)/%.asm | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
 	@nasm -f elf32 $< -o $@
@@ -58,8 +64,10 @@ $(BUILD_DIR)/cpp/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
 	@i386-elf-g++ $(CPPFLAGS) -c $< -o $@
 
-run: $(OS_IMAGE)
-	@qemu-system-i386 -drive file=$(OS_IMAGE),format=raw,if=floppy
+run: $(OS_IMAGE) | disk
+	@qemu-system-i386 \
+		-drive format=raw,file=$(OS_IMAGE),if=floppy \
+		-drive format=raw,file=build/disk.img,if=ide
 
 clean:
 	@rm -rf $(BUILD_DIR)
