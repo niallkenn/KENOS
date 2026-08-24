@@ -2,6 +2,7 @@
 #include "frameallocator.h"
 #include "heapallocator.h"
 #include "panic.h"
+#include "ide.h"
 
 void k_clear(Shell& shell) {
     if (shell.command_buffer.size() > 1) {
@@ -28,6 +29,7 @@ void k_help(Shell& shell) {
     shell.terminal.write("\nclear: clear the terminal");
     shell.terminal.write("\necho:  print text");
     shell.terminal.write("\nhelp:  list available commands");
+    shell.terminal.write("\nide:   show ide hard drive information");
     shell.terminal.write("\nmem:   show memory information");
 
     shell.terminal.new_line();
@@ -193,6 +195,15 @@ void k_about(Shell& shell) {
     shell.terminal.write("\t\tA 32-bit x86 operating system\n");
     shell.terminal.write("\t\tBuilt from the ground up\n");
     shell.terminal.write("\t\tWith nothing but shit code\n\n");
+}
+
+void k_ide(Shell& shell) {
+    uint32_t sectors = (uint32_t)(IDE::identifyReturn[61] << 16) | IDE::identifyReturn[60];
+
+    shell.terminal.write("\n\nIDE:\n\n");
+    shell.terminal.write("\tsectors: ");
+    shell.terminal.write_uint(sectors);
+    shell.terminal.write("\n\n");
 }
 
 void k_command_error(Shell& shell) {

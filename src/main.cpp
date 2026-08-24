@@ -12,6 +12,8 @@
 #include "heapallocator.h"
 #include "kstring.h"
 #include "kvector.h"
+#include "ide.h"
+#include "panic.h"
 
 extern "C" void main() {
     Idt::initialize();
@@ -28,6 +30,8 @@ extern "C" void main() {
     Paging::initialise();
 
     HeapAllocator::initialise();
+
+    if (!IDE::initialise()) panic("Could not read disk");
     
     Terminal terminal(5, 5, 315, 195, LIGHT_GREY, BLACK);
     Shell shell(terminal);

@@ -8,6 +8,7 @@ void k_help(Shell& shell);
 void k_about(Shell& shell);
 void k_mem(Shell& shell);
 void k_calc(Shell& shell);
+void k_ide(Shell& shell);
 
 void k_command_error(Shell& shell);
 
