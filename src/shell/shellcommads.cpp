@@ -200,9 +200,57 @@ void k_about(Shell& shell) {
 void k_ide(Shell& shell) {
     uint32_t sectors = (uint32_t)(IDE::identifyReturn[61] << 16) | IDE::identifyReturn[60];
 
+    char* type[22];
+
+    if (IDE::identifyReturn[0] & (1 << 15)) {
+        *type = "ATAPI (Optical Drive)";
+    } else {
+        *type = "ATA (Hard Drive)";
+    }
+
+    char model[41];
+    int char_index = 0;
+
+    for (int i = 27; i <= 46; i++) {
+        uint16_t word = IDE::identifyReturn[i];
+
+        model[char_index++] = (char)(word >> 8);
+        model[char_index++] = (char)(word & 0xFF);
+    }
+    
+    model[40] = '\0';
+
+    char serial[21];
+    char_index = 0;
+
+    for (int i = 10; i <= 19; i++) {
+        uint16_t word = IDE::identifyReturn[i];
+
+        serial[char_index++] = (char)(word >> 8);
+        serial[char_index++] = (char)(word & 0xFF);
+    }
+
+    serial[20] = '\0';
+
     shell.terminal.write("\n\nIDE:\n\n");
-    shell.terminal.write("\tsectors: ");
+
+    shell.terminal.write("\tDevice Type: ");
+    shell.terminal.write(*type);
+    shell.terminal.write("\n\tModel: ");
+    shell.terminal.write(model);
+    shell.terminal.write("\n\tSerial: ");
+    shell.terminal.write(serial);
+
+    shell.terminal.new_line();
+    shell.terminal.new_line();
+
+    shell.terminal.write("\n\tDrive Capacity: ");
+    shell.terminal.write_uint(sectors / 2048);
+    shell.terminal.write("MiB\n");
+
+    shell.terminal.write("\tSectors: ");
     shell.terminal.write_uint(sectors);
+
     shell.terminal.write("\n\n");
 }
 
