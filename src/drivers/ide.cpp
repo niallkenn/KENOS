@@ -72,3 +72,41 @@ bool IDE::readSector(uint32_t lba, uint8_t* buffer) {
 
     return true;
 }
+
+bool IDE::writeSector(uint32_t lba, const uint8_t* buffer) {
+    PortIO::outb(0x1F6, 0xE0 | ((lba >> 24) & 0x0F));
+
+    PortIO::outb(0x1F2, 1);
+
+    PortIO::outb(0x1F3, lba & 0xFF);
+    PortIO::outb(0x1F4, (lba >> 8) & 0xFF);
+    PortIO::outb(0x1F5, (lba >> 16) & 0xFF);
+
+    PortIO::outb(0x1F7, 0x30);
+
+    if (!waitForData()) return false;
+
+    for (int i = 0; i < 256; i++) {
+        uint16_t word = buffer[i * 2] | (static_cast<uint16_t>(buffer[i * 2 + 1]) << 8);
+
+        PortIO::outw(0x1F0, word);
+    }
+
+    uint8_t status;
+
+    for (uint32_t timeout = 0; timeout < 1000000; timeout++)
+    {
+        status = PortIO::inb(0x1F7);
+
+        if (!(status & (1 << 7)))
+            break;
+
+        if (timeout == 999999)
+            return false;
+    }
+
+    if (status & (1 << 0))
+        return false;
+
+    return true;
+}
