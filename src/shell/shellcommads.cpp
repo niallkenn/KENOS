@@ -198,9 +198,14 @@ void k_about(Shell& shell) {
 }
 
 void k_ide(Shell& shell) {
+    if (!IDE::driveFound) {
+        shell.terminal.write("\nIDE: drive not found\n");
+        return;
+    }
+
     uint32_t sectors = (uint32_t)(IDE::identifyReturn[61] << 16) | IDE::identifyReturn[60];
 
-    char* type[22];
+    const char* type[22];
 
     if (IDE::identifyReturn[0] & (1 << 15)) {
         *type = "ATAPI (Optical Drive)";

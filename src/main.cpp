@@ -30,10 +30,11 @@ extern "C" void main() {
     Paging::initialise();
 
     HeapAllocator::initialise();
-
-    if (!IDE::initialise()) panic("Could not read disk");
     
     Terminal terminal(5, 5, 315, 195, LIGHT_GREY, BLACK);
+
+    if (!IDE::initialise()) terminal.write("IDE: drive not found\n");
+
     Shell shell(terminal);
     
     Keyboard::set_shell(&shell);
