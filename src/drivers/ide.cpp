@@ -43,3 +43,32 @@ bool IDE::initialise() {
     driveFound = true;
     return true;
 }
+
+bool IDE::readSector(uint32_t lba, uint8_t* buffer) {
+    uint8_t status;
+
+    do
+    {
+        status = PortIO::inb(0x1F7);
+    } while ((status & (1 << 7)) || !(status & (1 << 6)));
+
+    PortIO::outb(0x1F2, 1);
+
+    PortIO::outb(0x1F3, (char)(lba & 0xFF));
+    PortIO::outb(0x1F4, (char)((lba >> 8) & 0xFF));
+    PortIO::outb(0x1F5, (char)((lba >> 16) & 0xFF));
+    PortIO::outb(0x1F6, 0xE0 | ((lba >> 24) & 0x0F));
+
+    PortIO::outb(0x1F7, 0x20);
+
+    if (!waitForData()) return false;
+
+    for (int i = 0; i < 256; i++) {
+        uint16_t word = PortIO::inw(0x1F0);
+
+        buffer[i * 2] = word & 0xFF;
+        buffer[i * 2 + 1] = word >> 8;
+    }
+
+    return true;
+}
