@@ -59,5 +59,32 @@ bool FAT16::format() {
 
     if (!IDE::writeSector(0, buffer)) return false;
 
+    buffer[0] = 0xF8;
+    buffer[1] = 0xFF;
+
+    buffer[2] = 0xFF;
+    buffer[3] = 0xFF;
+
+    for (int i = 4; i < 512; i++) {
+        buffer[i] = 0;
+    }
+
+    if (!IDE::writeSector(4, buffer)) return false;
+    if (!IDE::writeSector(132, buffer)) return false;
+
+    buffer[0] = 0;
+    buffer[1] = 0;
+    buffer[2] = 0;
+    buffer[3] = 0;
+
+    for (int i = 5; i <= 131; i++) {
+        if (!IDE::writeSector(i, buffer)) return false;
+        if (!IDE::writeSector(i + 128, buffer)) return false;
+    }
+
+    for (int i = 260; i <= 291; i++) {
+        if (!IDE::writeSector(i, buffer)) return false;
+    }
+
     return true;
 }
