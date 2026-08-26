@@ -40,7 +40,12 @@ extern "C" void main() {
 
     if (!FAT16::initialise()) terminal.write("FAT16: filesystem not found\n");
 
-    
+    kVector<DirectoryEntryName> entries = FAT16::listRootDirectory();
+
+    for (int i = 0; i < entries.size(); i++) {
+        terminal.write(entries[i].name);
+        terminal.new_line();
+    }
 
     Shell shell(terminal);
     

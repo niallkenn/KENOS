@@ -86,5 +86,43 @@ bool FAT16::format() {
         if (!IDE::writeSector(i, buffer)) return false;
     }
 
+    uint8_t sample[512] = {};
+    const char* name = "TEST    TXT";
+
+    for (int i = 0; i < 11; i++) {
+        sample[i] = name[i];
+    }
+
+    if (!IDE::writeSector(260, sample)) return false;
+    if (!IDE::writeSector(261, sample)) return false;
+
     return true;
+}
+
+kVector<DirectoryEntryName> FAT16::listRootDirectory() {
+    uint8_t buffer[512];
+    kVector<DirectoryEntryName> list;
+
+    for (uint32_t sector = 260; sector <= 291; sector++) {
+        if (!IDE::readSector(sector, buffer)) return {};
+
+        DirectoryEntry* entries = reinterpret_cast<DirectoryEntry*>(buffer);
+
+        for (int i = 0; i < 16; i++) {
+            if (entries[i].name[0] == 0x00) continue;
+
+            
+            DirectoryEntryName name{};
+
+            for (int j = 0; j < 11; j++) {
+                name.name[j] = entries[i].name[j];
+            }
+
+            name.name[11] = '\0';
+
+            list.push_back(name);
+        }
+    }
+
+    return list;
 }
