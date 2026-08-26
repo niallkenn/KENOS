@@ -9,4 +9,5 @@ class FAT16 {
         FAT16() = delete;
 
         static bool initialise();
+        static bool format();
 };

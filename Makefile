@@ -67,7 +67,8 @@ $(BUILD_DIR)/cpp/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 run: $(OS_IMAGE) | disk
 	@qemu-system-i386 \
 		-drive format=raw,file=$(OS_IMAGE),if=floppy \
-		-drive format=raw,file=build/disk.img,if=ide
+		-drive format=raw,file=build/disk.img,if=ide \
+		-boot order=a
 
 clean:
 	@rm -rf $(BUILD_DIR)
