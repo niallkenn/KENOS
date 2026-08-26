@@ -14,6 +14,7 @@
 #include "kvector.h"
 #include "ide.h"
 #include "panic.h"
+#include "fat16.h"
 
 extern "C" void main() {
     Idt::initialize();
@@ -34,6 +35,7 @@ extern "C" void main() {
     Terminal terminal(5, 5, 315, 195, LIGHT_GREY, BLACK);
 
     if (!IDE::initialise()) terminal.write("IDE: drive not found\n");
+    else if (!FAT16::initialise()) terminal.write("FAT16: filesystem not found\n");
 
     Shell shell(terminal);
     
