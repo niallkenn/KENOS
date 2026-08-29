@@ -93,8 +93,13 @@ bool FAT16::format() {
         sample[i] = name[i];
     }
 
-    if (!IDE::writeSector(260, sample)) return false;
     if (!IDE::writeSector(261, sample)) return false;
+
+    for (int i = 32; i < 32 + 11; i++) {
+        sample[i] = name[i];
+    }
+
+    if (!IDE::writeSector(260, sample)) return false;
 
     return true;
 }
@@ -125,4 +130,20 @@ kVector<DirectoryEntryName> FAT16::listRootDirectory() {
     }
 
     return list;
+}
+
+DirectoryEntryLocation FAT16::findFreeDirectoryEntry() {
+    uint8_t buffer[512];
+
+    for (uint32_t sector = 260; sector <= 291; sector++) {
+        if (!IDE::readSector(sector, buffer)) return {};
+
+        DirectoryEntry* entries = reinterpret_cast<DirectoryEntry*>(buffer);
+
+        for (unsigned int i = 0; i < 16; i++) {
+            if (entries[i].name[0] == 0x00) return {sector, i * 32};
+        }
+    }
+
+    return {};
 }

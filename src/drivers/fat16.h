@@ -22,6 +22,11 @@ struct DirectoryEntryName {
     char name[12];
 };
 
+struct DirectoryEntryLocation {
+    uint32_t sector;
+    uint32_t offset;
+};
+
 class FAT16 {
     private:
 
@@ -32,4 +37,5 @@ class FAT16 {
         static bool format();
         
         static kVector<DirectoryEntryName> listRootDirectory();
+        static DirectoryEntryLocation findFreeDirectoryEntry();
 };
