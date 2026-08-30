@@ -40,6 +40,10 @@ extern "C" void main() {
 
     if (!FAT16::initialise()) terminal.write("FAT16: filesystem not found\n");
 
+    FAT16::allocateCluster(2);
+    FAT16::allocateCluster(3);
+    FAT16::allocateCluster(5);
+    
     uint32_t free = FAT16::findFreeCluster();
     terminal.write_uint(free);
 

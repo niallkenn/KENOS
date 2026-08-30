@@ -157,10 +157,34 @@ int32_t FAT16::findFreeCluster() {
         for (int i = 0; i < 256; i++) {
             uint32_t cluster = (sector - 4) * 256 + i;
             if (cluster < 2) continue;
-            
+
             if (buffer[2 * i + 1] == 0 && buffer[2 * i] == 0) return cluster;
         }
     }
 
     return -1;
+}
+
+bool FAT16::allocateCluster(uint32_t cluster) {
+    uint32_t sector = 4 + cluster / 256;
+
+    uint8_t buffer[512];
+
+    if (!IDE::readSector(sector, buffer)) return false;
+
+    buffer[2 * cluster] = 0xFF;
+    buffer[2 * cluster + 1] = 0xFF;
+
+    if (!IDE::writeSector(sector, buffer)) return false;
+
+    sector += 128;
+
+    if (!IDE::readSector(sector, buffer)) return false;
+
+    buffer[2 * (cluster % 256)] = 0xFF;
+    buffer[2 * (cluster % 256) + 1] = 0xFF;
+
+    if (!IDE::writeSector(sector, buffer)) return false;
+
+    return true;
 }
