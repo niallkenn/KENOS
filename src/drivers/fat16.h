@@ -38,4 +38,5 @@ class FAT16 {
         
         static kVector<DirectoryEntryName> listRootDirectory();
         static DirectoryEntryLocation findFreeDirectoryEntry();
+        static int32_t findFreeCluster();
 };

@@ -40,13 +40,8 @@ extern "C" void main() {
 
     if (!FAT16::initialise()) terminal.write("FAT16: filesystem not found\n");
 
-    DirectoryEntryLocation loc = FAT16::findFreeDirectoryEntry();
-
-    terminal.write("free dir entry:\n\tsector: ");
-    terminal.write_uint(loc.sector);
-    terminal.write("\n\toffset: ");
-    terminal.write_uint(loc.offset);
-    terminal.new_line();
+    uint32_t free = FAT16::findFreeCluster();
+    terminal.write_uint(free);
 
     Shell shell(terminal);
     

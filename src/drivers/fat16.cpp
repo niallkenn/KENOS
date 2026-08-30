@@ -147,3 +147,20 @@ DirectoryEntryLocation FAT16::findFreeDirectoryEntry() {
 
     return {};
 }
+
+int32_t FAT16::findFreeCluster() {
+    uint8_t buffer[512];
+
+    for (uint32_t sector = 4; sector < 128 + 4; sector++) {
+        if (!IDE::readSector(sector, buffer)) return -1;
+
+        for (int i = 0; i < 256; i++) {
+            uint32_t cluster = (sector - 4) * 256 + i;
+            if (cluster < 2) continue;
+            
+            if (buffer[2 * i + 1] == 0 && buffer[2 * i] == 0) return cluster;
+        }
+    }
+
+    return -1;
+}
