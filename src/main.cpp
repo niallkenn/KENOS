@@ -40,13 +40,17 @@ extern "C" void main() {
 
     if (!FAT16::initialise()) terminal.write("FAT16: filesystem not found\n");
 
-    FAT16::allocateCluster(2);
-    FAT16::allocateCluster(3);
-    FAT16::allocateCluster(5);
-    
-    uint32_t free = FAT16::findFreeCluster();
-    terminal.write_uint(free);
+    FAT16::createFile("file1.");
+    FAT16::createFile("file2.c");
+    FAT16::createFile("file3.txt");
 
+    kVector<DirectoryEntryName> names = FAT16::listRootDirectory();
+
+    for (size_t i = 0; i < names.size(); i++) {
+        terminal.write(names[i].name);
+        terminal.new_line();
+    }
+    
     Shell shell(terminal);
     
     Keyboard::set_shell(&shell);

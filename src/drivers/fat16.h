@@ -35,6 +35,8 @@ class FAT16 {
 
         static bool initialise();
         static bool format();
+
+        static bool createFile(const char* filename);
         
         static kVector<DirectoryEntryName> listRootDirectory();
         static DirectoryEntryLocation findFreeDirectoryEntry();

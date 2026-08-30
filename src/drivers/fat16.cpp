@@ -1,5 +1,6 @@
 #include "fat16.h"
 #include "ide.h"
+#include "kstring.h"
 
 bool FAT16::initialise() {
     uint8_t buffer[512];
@@ -86,21 +87,6 @@ bool FAT16::format() {
         if (!IDE::writeSector(i, buffer)) return false;
     }
 
-    uint8_t sample[512] = {};
-    const char* name = "TEST    TXT";
-
-    for (int i = 0; i < 11; i++) {
-        sample[i] = name[i];
-    }
-
-    if (!IDE::writeSector(261, sample)) return false;
-
-    for (int i = 32; i < 32 + 11; i++) {
-        sample[i] = name[i];
-    }
-
-    if (!IDE::writeSector(260, sample)) return false;
-
     return true;
 }
 
@@ -185,6 +171,129 @@ bool FAT16::allocateCluster(uint32_t cluster) {
     buffer[2 * (cluster % 256) + 1] = 0xFF;
 
     if (!IDE::writeSector(sector, buffer)) return false;
+
+    return true;
+}
+
+bool is_upper(char c) {
+    if (c >= 65 && c <= 90) return true;
+    return false;
+}
+
+bool invalid_char(char c) {
+    if (c >= 'a' && c <= 'z') return false;
+    if (c >= 'A' && c <= 'Z') return false;
+    if (c >= '0' && c <= '9') return false;
+
+    return true;
+}
+
+bool FAT16::createFile(const char* filename) {
+    kString input(filename);
+    size_t input_size = input.size();
+
+    if (input_size == 0) return false;
+
+    int points = 0;
+
+    for (size_t i = 0; i < input_size; i++) if (input[i] == '.') points++;
+
+    if (points > 1) return false;
+
+    char fatname[11];
+
+    for (int i = 0; i < 11; i++) fatname[i] = ' ';
+
+    if (points == 1) {
+        size_t pointindex = 0;
+        for (size_t i = 0; i < input_size; i++) {
+            if (input[i] == '.') {
+                pointindex = i;
+                continue;
+            }
+            if (invalid_char(input[i])) return false;
+        }
+
+        if (pointindex == input_size - 1) return false;
+        if (pointindex > 8) return false;
+        if (input_size - pointindex - 1 > 3) return false;
+
+        char prename[8] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+
+        for (size_t i = 0; i < pointindex; i++) {
+            char c = input[i];
+            
+            if (c >= 'a' && c <='z') {
+                c = c - 'a' + 'A';
+            }
+
+            prename[i] = c;
+        }
+
+        char extension[3] = {' ', ' ', ' '};
+
+        for (size_t i = pointindex + 1; i < input_size; i++) {
+            char c = input[i];
+            
+            if (c >= 'a' && c <='z') {
+                c = c - 'a' + 'A';
+            }
+
+            extension[i - pointindex - 1] = c;
+        }
+
+        for (int i = 0; i < 8; i++) {
+            fatname[i] = prename[i];
+        }
+
+        for (int i = 0; i < 3; i++) {
+            fatname[i + 8] = extension[i];
+        }
+    } else {
+        if (input_size > 8) return false;
+
+        for (size_t i = 0; i < input_size; i++) {
+            if (invalid_char(input[i])) return false;
+            if (input[i] >= 'a' && input[i] <= 'z') {
+                fatname[i] = input[i] - 'a' + 'A';
+            } else {
+                fatname[i] = input[i];
+            }
+        }
+
+        if (input_size != 11) {
+            for (int i = input_size; i < 11; i++) {
+                fatname[i] = ' ';
+            }
+        }
+    }
+
+    DirectoryEntryLocation location = findFreeDirectoryEntry();
+    int32_t cluster = findFreeCluster();
+    if (cluster == -1) return false;
+
+    if (!allocateCluster(cluster)) return false;
+
+    DirectoryEntry entry{};
+
+    for (int i = 0; i < 11; i++) {
+        entry.name[i] = fatname[i];
+    }
+
+    entry.firstClusterHigh = 0;
+    entry.firstClusterLow = static_cast<uint16_t>(cluster);
+    entry.fileSize = 0;
+    entry.attributes = 0;
+
+    uint8_t buffer[512];
+
+    if (!IDE::readSector(location.sector, buffer)) return false;
+
+    for (uint32_t i = 0; i < 32; i++) {
+        buffer[location.offset + i] = reinterpret_cast<uint8_t*>(&entry)[i];
+    }
+
+    if (!IDE::writeSector(location.sector, buffer)) return false;
 
     return true;
 }
