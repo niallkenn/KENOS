@@ -301,19 +301,53 @@ bool FAT16::createFile(const char* filename) {
     return true;
 }
 
-bool FAT16::fileExists(const char* filename) {
-    kString name(filename);
+bool FAT16::fileExists(const char* fatname) {
+    kString name(fatname);
 
     kVector<DirectoryEntryName> names = listRootDirectory();
 
     for (size_t i = 0; i < names.size(); i++) {
         for (size_t j = 0; j < 11; j++) {
-            if (names[i].name[j] != filename[j]) {
+            if (names[i].name[j] != fatname[j]) {
                 break;
             }
         }
 
         return true;
+    }
+
+    return false;
+}
+
+bool FAT16::findFile(const char* fatname, DirectoryEntry& entry, DirectoryEntryLocation& location) {
+    uint8_t buffer[512];
+
+    for (uint32_t sector = 260; sector <= 291; sector++) {
+        if (!IDE::readSector(sector, buffer)) return false;
+
+        DirectoryEntry* entries = reinterpret_cast<DirectoryEntry*>(buffer);
+        for (int i = 0; i < 16; i++) {
+            if (entries[i].name[0] == 0x00) continue;
+            if (entries[i].name[0] == 0xE5) continue;
+
+            bool match = true;
+
+            for (int j = 0; j < 11; j++) {
+                if (entries[i].name[j] != fatname[j]) {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (!match) continue;
+
+            location.sector = sector;
+            location.offset = i * 32;
+
+            entry = entries[i];
+
+            return true;
+        }
     }
 
     return false;
