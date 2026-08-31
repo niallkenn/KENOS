@@ -43,6 +43,8 @@ extern "C" void main() {
     FAT16::createFile("file1.");
     FAT16::createFile("file2.c");
     FAT16::createFile("file3.txt");
+    kString name("FILE    TXT");
+    terminal.write_uint(name.size());
 
     kVector<DirectoryEntryName> names = FAT16::listRootDirectory();
 

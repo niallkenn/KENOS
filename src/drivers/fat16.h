@@ -42,4 +42,5 @@ class FAT16 {
         static DirectoryEntryLocation findFreeDirectoryEntry();
         static int32_t findFreeCluster();
         static bool allocateCluster(uint32_t cluster);
+        static bool fileExists(const char* filename);
 };

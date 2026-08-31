@@ -101,6 +101,7 @@ kVector<DirectoryEntryName> FAT16::listRootDirectory() {
 
         for (int i = 0; i < 16; i++) {
             if (entries[i].name[0] == 0x00) continue;
+            if (entries[i].name[0] == 0xE5) continue;
 
             
             DirectoryEntryName name{};
@@ -268,6 +269,8 @@ bool FAT16::createFile(const char* filename) {
         }
     }
 
+    if (fileExists(fatname)) return false;
+
     DirectoryEntryLocation location = findFreeDirectoryEntry();
     int32_t cluster = findFreeCluster();
     if (cluster == -1) return false;
@@ -296,4 +299,22 @@ bool FAT16::createFile(const char* filename) {
     if (!IDE::writeSector(location.sector, buffer)) return false;
 
     return true;
+}
+
+bool FAT16::fileExists(const char* filename) {
+    kString name(filename);
+
+    kVector<DirectoryEntryName> names = listRootDirectory();
+
+    for (size_t i = 0; i < names.size(); i++) {
+        for (size_t j = 0; j < 11; j++) {
+            if (names[i].name[j] != filename[j]) {
+                break;
+            }
+        }
+
+        return true;
+    }
+
+    return false;
 }
