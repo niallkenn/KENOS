@@ -37,6 +37,7 @@ class FAT16 {
         static bool format();
 
         static bool createFile(const char* filename);
+        static bool writeFile(const char* filename, const uint8_t* data, uint32_t size);
         
         static kVector<DirectoryEntryName> listRootDirectory();
         static DirectoryEntryLocation findFreeDirectoryEntry();
@@ -44,4 +45,5 @@ class FAT16 {
         static bool allocateCluster(uint32_t cluster);
         static bool fileExists(const char* fatname);
         static bool findFile(const char* fatname, DirectoryEntry& entry, DirectoryEntryLocation& location);
+        static bool convertFatName(const char* filename, char fatname[11]);
 };

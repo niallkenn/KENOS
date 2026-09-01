@@ -100,7 +100,7 @@ kVector<DirectoryEntryName> FAT16::listRootDirectory() {
         DirectoryEntry* entries = reinterpret_cast<DirectoryEntry*>(buffer);
 
         for (int i = 0; i < 16; i++) {
-            if (entries[i].name[0] == 0x00) continue;
+            if (entries[i].name[0] == 0) continue;
             if (entries[i].name[0] == 0xE5) continue;
 
             
@@ -351,4 +351,91 @@ bool FAT16::findFile(const char* fatname, DirectoryEntry& entry, DirectoryEntryL
     }
 
     return false;
+}
+
+
+bool FAT16::convertFatName(const char* filename, char fatname[11]) {
+    kString input(filename);
+    size_t input_size = input.size();
+
+    if (input_size == 0) return false;
+
+    int points = 0;
+
+    for (size_t i = 0; i < input_size; i++) if (input[i] == '.') points++;
+
+    if (points > 1) return false;
+
+    for (int i = 0; i < 11; i++) fatname[i] = ' ';
+
+    if (points == 1) {
+        size_t pointindex = 0;
+        for (size_t i = 0; i < input_size; i++) {
+            if (input[i] == '.') {
+                pointindex = i;
+                continue;
+            }
+            if (invalid_char(input[i])) return false;
+        }
+
+        if (pointindex == input_size - 1) return false;
+        if (pointindex > 8) return false;
+        if (input_size - pointindex - 1 > 3) return false;
+
+        char prename[8] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+
+        for (size_t i = 0; i < pointindex; i++) {
+            char c = input[i];
+            
+            if (c >= 'a' && c <='z') {
+                c = c - 'a' + 'A';
+            }
+
+            prename[i] = c;
+        }
+
+        char extension[3] = {' ', ' ', ' '};
+
+        for (size_t i = pointindex + 1; i < input_size; i++) {
+            char c = input[i];
+            
+            if (c >= 'a' && c <='z') {
+                c = c - 'a' + 'A';
+            }
+
+            extension[i - pointindex - 1] = c;
+        }
+
+        for (int i = 0; i < 8; i++) {
+            fatname[i] = prename[i];
+        }
+
+        for (int i = 0; i < 3; i++) {
+            fatname[i + 8] = extension[i];
+        }
+    } else {
+        if (input_size > 8) return false;
+
+        for (size_t i = 0; i < input_size; i++) {
+            if (invalid_char(input[i])) return false;
+            if (input[i] >= 'a' && input[i] <= 'z') {
+                fatname[i] = input[i] - 'a' + 'A';
+            } else {
+                fatname[i] = input[i];
+            }
+        }
+
+        if (input_size != 11) {
+            for (int i = input_size; i < 11; i++) {
+                fatname[i] = ' ';
+            }
+        }
+    }
+
+    return true;
+}
+
+bool FAT16::writeFile(const char* filename, const uint8_t* data, uint32_t size) {
+    
+    return true;
 }
