@@ -39,12 +39,15 @@ extern "C" void main() {
     FAT16::format();
 
     if (!FAT16::initialise()) terminal.write("FAT16: filesystem not found\n");
+<<<<<<< HEAD
 
     
 
     kVector<DirectoryEntryName> names = FAT16::listRootDirectory();
 
     
+=======
+>>>>>>> 9ce9bf2 (stable FAT16 findFile state)
     
     Shell shell(terminal);
     

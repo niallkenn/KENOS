@@ -100,8 +100,13 @@ kVector<DirectoryEntryName> FAT16::listRootDirectory() {
         DirectoryEntry* entries = reinterpret_cast<DirectoryEntry*>(buffer);
 
         for (int i = 0; i < 16; i++) {
+<<<<<<< HEAD
             if (entries[i].name[0] == 0) continue;
             if (entries[i].name[0] == 0xE5) continue;
+=======
+            if (static_cast<unsigned char>(entries[i].name[0]) == 0x00) continue;
+            if (static_cast<unsigned char>(entries[i].name[0]) == 0xE5) continue;
+>>>>>>> 9ce9bf2 (stable FAT16 findFile state)
 
             
             DirectoryEntryName name{};
@@ -327,8 +332,8 @@ bool FAT16::findFile(const char* fatname, DirectoryEntry& entry, DirectoryEntryL
 
         DirectoryEntry* entries = reinterpret_cast<DirectoryEntry*>(buffer);
         for (int i = 0; i < 16; i++) {
-            if (entries[i].name[0] == 0x00) continue;
-            if (entries[i].name[0] == 0xE5) continue;
+            if (static_cast<unsigned char>(entries[i].name[0]) == 0x00) continue;
+            if (static_cast<unsigned char>(entries[i].name[0]) == 0xE5) continue;
 
             bool match = true;
 
