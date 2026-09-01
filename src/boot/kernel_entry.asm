@@ -1,8 +1,13 @@
 [bits 32]
+
 [extern main]
-[global .start]
+[global _start]
 
 section .text.start
-.start:
+
+_start:
     call main
-    jmp $
+    cli
+.hang:
+    hlt
+    jmp .hang
