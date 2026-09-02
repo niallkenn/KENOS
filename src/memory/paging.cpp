@@ -33,25 +33,25 @@ void Paging::enable_paging() {
 
 void Paging::initialise() {
     page_directory = reinterpret_cast<uint32_t*>(FrameAllocator::allocate());
-    page_table0 = reinterpret_cast<uint32_t*>(FrameAllocator::allocate());
-
-    uint32_t directory_address = reinterpret_cast<uint32_t>(page_directory);
-    uint32_t table0_address = reinterpret_cast<uint32_t>(page_table0);
-
+    
+    // Clear page directory entries
     for (int i = 0; i < 1024; i++) {
         page_directory[i] = 0;
-        page_table0[i] = 0;
     }
 
-    for (int i = 0; i < 1024; i++) {
-        uint32_t physical_address = i << 12;
+    // Map first 8MB (2 Page Tables = 2048 entries of 4KB each)
+    for (int pt_idx = 0; pt_idx < 2; pt_idx++) {
+        uint32_t* page_table = reinterpret_cast<uint32_t*>(FrameAllocator::allocate());
+        
+        for (int i = 0; i < 1024; i++) {
+            uint32_t physical_address = (pt_idx * 1024 + i) << 12;
+            page_table[i] = physical_address | PRESENT | WRITABLE;
+        }
 
-        page_table0[i] = physical_address | PRESENT | WRITABLE;
+        page_directory[pt_idx] = reinterpret_cast<uint32_t>(page_table) | PRESENT | WRITABLE;
     }
 
-    page_directory[0] = table0_address | PRESENT | WRITABLE;
-
-    load_page_directory(directory_address);
+    load_page_directory(reinterpret_cast<uint32_t>(page_directory));
     enable_paging();
 }
 

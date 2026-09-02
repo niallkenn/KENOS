@@ -16,7 +16,7 @@
 #include "panic.h"
 #include "fat16.h"
 
-extern "C" void main() {
+extern "C" void main(uint32_t multibootaddress) {
     Idt::initialize();
 
     Pic::initialize();
@@ -24,7 +24,7 @@ extern "C" void main() {
     uint32_t pit_frequency = 100;
     Pit::initialize(pit_frequency);
 
-    MemoryMap::initialize();
+    MemoryMap::initialize(multibootaddress);
 
     FrameAllocator::initialise();
 
@@ -39,12 +39,6 @@ extern "C" void main() {
     FAT16::format();
 
     if (!FAT16::initialise()) terminal.write("FAT16: filesystem not found\n");
-
-    
-
-    kVector<DirectoryEntryName> names = FAT16::listRootDirectory();
-
-    
     
     Shell shell(terminal);
     

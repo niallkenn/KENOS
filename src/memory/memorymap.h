@@ -13,7 +13,7 @@ class MemoryMap {
     public:
         MemoryMap() = delete;
 
-        static void initialize();
+        static void initialize(uint32_t address);
 
         static MemoryMapEntry* entries();
         static uint16_t count();
