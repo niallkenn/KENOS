@@ -16,3 +16,8 @@ typedef int ssize_t;
 typedef int ptrdiff_t;
 typedef uint32_t uintptr_t;
 typedef int32_t intptr_t;
+
+extern "C" {
+    extern uint32_t _kernel_end[];
+    extern uint32_t _kernel_start[];
+}

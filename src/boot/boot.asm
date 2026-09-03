@@ -1,3 +1,5 @@
+[bits 32]
+
 section .multiboot
 align 8
 header_start:

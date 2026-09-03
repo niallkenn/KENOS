@@ -21,9 +21,9 @@ CXX = i386-elf-g++
 LD = i386-elf-ld
 
 CPPFLAGS = -m32 -ffreestanding -fno-pie -fno-rtti -fno-exceptions -Wall -Wextra \
-	I$(SRC_DIR) \
-	I$(SRC_DIR)/memory \
-	I$(SRC_DIR)/lib
+	-I$(SRC_DIR) \
+	-I$(SRC_DIR)/memory \
+	-I$(SRC_DIR)/sys
 
 .PHONY: all clean
 

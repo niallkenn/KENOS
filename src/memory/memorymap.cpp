@@ -15,7 +15,7 @@ struct __attribute__((packed)) MultibootMemoryMapTag {
     uint32_t entry_version;
 };
 
-void MemoryMap::initialize(uint32_t address) {
+void MemoryMap::initialise(uint32_t address) {
     map_entries = nullptr;
     map_count = 0;
 
