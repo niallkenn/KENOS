@@ -1,14 +1,17 @@
-%define ALIGN    1<<0             
-%define MEMINFO  1<<1             
-%define FLAGS    (ALIGN | MEMINFO)  
-%define MAGIC    0x1BADB002       
-%define CHECKSUM -(MAGIC + FLAGS)
-
 section .multiboot
-align 4
-	dd MAGIC
-	dd FLAGS
-	dd CHECKSUM
+align 8
+header_start:
+	dd 0xE85250D6
+	dd 0
+	dd header_end - header_start
+	dd 0x100000000 - (0xE85250D6 + 0 + (header_end - header_start))
+
+	; framebuffer reques tag or sm
+
+	dw 0
+	dw 0
+	dd 8
+header_end:
 
 section .bss
 align 16
@@ -24,6 +27,8 @@ extern kernel_main
 _start:
 	mov esp, stack_top
 
+	push ebx
+	
 	call kernel_main
 	
 	cli
