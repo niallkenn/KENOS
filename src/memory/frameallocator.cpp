@@ -82,12 +82,13 @@ void FrameAllocator::initialise(uint32_t mb_addr, uint32_t mb_size) {
     }
 
     // 3. Reserve lower memory + Kernel binary footprint [0x0 -> _kernel_end]
-    uint32_t kernel_end_addr = reinterpret_cast<uint32_t>(_kernel_end); 
-    reserve_region(0, kernel_end_addr);
+    uint32_t kernel_end_phys = VIRTUAL_TO_PHYSICAL(reinterpret_cast<uint32_t>(_kernel_end));
+    reserve_region(0, kernel_end_phys);
 
     // 4. Reserve Multiboot info buffer passed by GRUB
     if (mb_addr != 0 && mb_size != 0) {
-        reserve_region(mb_addr, mb_addr + mb_size);
+        uint32_t mb_phys = VIRTUAL_TO_PHYSICAL(mb_addr);
+        reserve_region(mb_phys, mb_phys + mb_size);
     }
 
     m_next_free_index = 0;

@@ -2,31 +2,39 @@ ENTRY(_start)
 
 SECTIONS
 {
-    . = 1M;
+    /* Physical entry point at 1MB */
+    . = 0x00100000;
 
-	_kernel_start = .;
-
-    .text BLOCK(4K) : ALIGN(4K)
+    .boot ALIGN(4) : AT(0x00100000)
     {
-        KEEP(*(.multiboot))
-        *(.text)
+        *(.boot)
     }
 
-    .rodata BLOCK(4K) : ALIGN(4K)
-	{
-		*(.rodata)
-	}
+    /* Transition location counter to Higher Half (3GB) */
+    . += 0xC0000000;
 
-    .data BLOCK(4K) : ALIGN(4K)
-	{
-		*(.data)
-	}
+    _kernel_start = .;
 
-	.bss BLOCK(4K) : ALIGN(4K)
-	{
-		*(COMMON)
-		*(.bss)
-	}
+    .text ALIGN(4096) : AT(ADDR(.text) - 0xC0000000)
+    {
+        *(.text*)
+    }
 
-	_kernel_end = .;
+    .rodata ALIGN(4096) : AT(ADDR(.rodata) - 0xC0000000)
+    {
+        *(.rodata*)
+    }
+
+    .data ALIGN(4096) : AT(ADDR(.data) - 0xC0000000)
+    {
+        *(.data*)
+    }
+
+    .bss ALIGN(4096) : AT(ADDR(.bss) - 0xC0000000)
+    {
+        *(COMMON)
+        *(.bss*)
+    }
+
+    _kernel_end = .;
 }

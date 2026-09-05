@@ -3,11 +3,11 @@
 
 uint32_t* Paging::page_directory = nullptr;
 
-void Paging::load_page_directory(uint32_t page_directory_address) {
+void Paging::load_page_directory(uint32_t page_directory_phys) {
     asm volatile(
         "movl %0, %%cr3"
         :
-        : "r" (page_directory_address)
+        : "r" (page_directory_phys)
         : "memory"
     );
 }
@@ -31,8 +31,10 @@ void Paging::enable_paging() {
 }
 
 void Paging::initialise() {
+    uint32_t pd_phys = reinterpret_cast<uint32_t>(FrameAllocator::allocate());
+    if (!pd_phys) return;
+
     page_directory = reinterpret_cast<uint32_t*>(FrameAllocator::allocate());
-    if (!page_directory) return;
 
     // Clear page directory entries
     for (int i = 0; i < 1024; i++) {
@@ -41,19 +43,20 @@ void Paging::initialise() {
 
     // Identity map first 8MB (2 Page Tables = 2048 entries of 4KB each)
     for (int pt_idx = 0; pt_idx < 2; pt_idx++) {
+        uint32_t pt_phys = reinterpret_cast<uint32_t>(FrameAllocator::allocate());
+        if (!pt_phys) return;
+
         uint32_t* page_table = reinterpret_cast<uint32_t*>(FrameAllocator::allocate());
-        if (!page_table) return;
 
         for (int i = 0; i < 1024; i++) {
             uint32_t physical_address = (pt_idx * 1024 + i) << 12;
             page_table[i] = physical_address | PRESENT | WRITABLE;
         }
 
-        page_directory[pt_idx] = reinterpret_cast<uint32_t>(page_table) | PRESENT | WRITABLE;
+        page_directory[pt_idx + 768] = pt_phys | PRESENT | WRITABLE;
     }
 
-    load_page_directory(reinterpret_cast<uint32_t>(page_directory));
-    enable_paging();
+    load_page_directory(pd_phys);
 }
 
 void Paging::map_page(uint32_t virtual_address, uint32_t physical_address, uint32_t flags) {
@@ -63,15 +66,16 @@ void Paging::map_page(uint32_t virtual_address, uint32_t physical_address, uint3
     uint32_t* page_table = nullptr;
 
     if ((page_directory[page_directory_index] & PRESENT) == 0) {
-        page_table = reinterpret_cast<uint32_t*>(FrameAllocator::allocate());
-        if (!page_table) return;
+        uint32_t pt_phys = reinterpret_cast<uint32_t>(FrameAllocator::allocate());
+        if (!pt_phys) return;
 
+        page_table = reinterpret_cast<uint32_t*>(PHYSICAL_TO_VIRTUAL(pt_phys));
         for (int i = 0; i < 1024; i++) page_table[i] = 0;
 
-        // Ensure PDE gets present, writable, and user permissions if specified in flags
-        page_directory[page_directory_index] = reinterpret_cast<uint32_t>(page_table) | PRESENT | WRITABLE | (flags & USER);
+        page_directory[page_directory_index] = pt_phys | PRESENT | WRITABLE | (flags & USER);
     } else {
-        page_table = reinterpret_cast<uint32_t*>(page_directory[page_directory_index] & 0xFFFFF000);
+        uint32_t pt_phys = page_directory[page_directory_index] & 0xFFFFF000;
+        page_table = reinterpret_cast<uint32_t*>(PHYSICAL_TO_VIRTUAL(pt_phys));
     }
 
     page_table[page_table_index] = (physical_address & 0xFFFFF000) | flags;

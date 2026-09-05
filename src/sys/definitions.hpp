@@ -1,5 +1,10 @@
 #pragma once
 
+#define KERNEL_VIRTUAL_BASE 0xC0000000
+
+#define VIRTUAL_TO_PHYSICAL(addr)  ((uintptr_t)(addr) - KERNEL_VIRTUAL_BASE)
+#define PHYSICAL_TO_VIRTUAL(addr)  ((uintptr_t)(addr) + KERNEL_VIRTUAL_BASE)
+
 typedef unsigned char      uint8_t;
 typedef unsigned short     uint16_t;
 typedef unsigned int       uint32_t;
