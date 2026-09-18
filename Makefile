@@ -6,7 +6,8 @@ CC_FLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra \
 	-I$(SRC_DIR) \
 	-I$(SRC_DIR)/sys \
 	-I$(SRC_DIR)/processes \
-	-I$(SRC_DIR)/interrupts
+	-I$(SRC_DIR)/interrupts \
+	-I$(SRC_DIR)/gdt
 
 LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
 
