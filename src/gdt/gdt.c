@@ -22,6 +22,8 @@ static void set_gate(int vector, uint32_t base, uint32_t limit, uint8_t access, 
     gdt[vector].access = access;
 }
 
+static uint8_t tss_kernel_stack[4096];
+
 // init gdt definition
 void init_gdt() {
     // init gdt ptr
@@ -36,7 +38,7 @@ void init_gdt() {
     }
 
     tss_entry.ss0 = 0x10;
-    tss_entry.esp0 = 0x0;
+    tss_entry.esp0 = (uint32_t)tss_kernel_stack + sizeof(tss_kernel_stack);
     uint32_t tss_base = (uint32_t)&tss_entry;
     uint32_t tss_limit = sizeof(tss_entry) - 1;
     

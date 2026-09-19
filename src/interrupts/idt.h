@@ -60,6 +60,9 @@ extern void isr29();
 extern void isr30();
 extern void isr31();
 
+// syscall isr
+extern void isr128();
+
 // lidt asm wrapper
 void load_idt(idtr_t* idtr);
 // init interrupt descriptor table

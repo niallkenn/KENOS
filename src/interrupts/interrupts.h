@@ -32,4 +32,7 @@ typedef struct registers_t {
 // common interrupt handler dispatcher
 void interrupt_handler(registers_t* registers);
 
+// syscall dispatcher
+extern void handle_syscall(registers_t* registers);
+
 #endif

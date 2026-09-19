@@ -54,6 +54,9 @@ ISR_NO_ERR_CODE 29
 ISR_NO_ERR_CODE 30
 ISR_NO_ERR_CODE 31
 
+# syscall isr 0x80
+ISR_NO_ERR_CODE 128
+
 # common cleanup for interrupt handlers
 interrupt_common:
     pushal
@@ -66,6 +69,8 @@ interrupt_common:
     movw $0x10, %ax
     movw %ax, %ds
     movw %ax, %es
+    movw %ax, %fs
+    movw %ax, %gs
 
     mov %esp, %eax
     pushl %eax
