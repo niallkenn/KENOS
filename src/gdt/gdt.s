@@ -1,4 +1,15 @@
 .section .text
+
+.global tss_flush
+.type tss_flush, @function
+
+tss_flush:
+    mov $(0x28 | 3), %ax
+    # loads the task state segment selector from gdt into the task register
+    ltr %ax
+
+    ret
+
 .global gdt_flush
 .type gdt_flush, @function
 
