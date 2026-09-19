@@ -25,7 +25,7 @@ static void set_gate(int vector, uint32_t base, uint32_t limit, uint8_t access, 
 // init gdt definition
 void init_gdt() {
     // init gdt ptr
-    gdt_ptr.limit = (sizeof(gdt_entry_t) * 5) - 1;
+    gdt_ptr.limit = (sizeof(gdt_entry_t) * 6) - 1;
     gdt_ptr.base = (uint32_t)&gdt;
 
     // init tss entry
