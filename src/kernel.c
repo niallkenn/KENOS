@@ -2,16 +2,12 @@
 #include "idt.h"
 #include "gdt.h"
 #include "unistd.h"
+#include "process.h"
 
-extern void enter_usermode(uint32_t entry_point, uint32_t user_stack);
+extern void start_first_process(uint32_t esp);
 
-static uint8_t user_stack[4096];
-
-void user_main(void) {
-    const char* msg = "funny 67";
-    
-    write(1, msg, 9);
-
+void init_main(void) {
+    write(1, "HELLO FROM PID 1, INIT ", 24);
     while (1) {}
 }
 // main kernel function
@@ -20,14 +16,11 @@ void kernel_main() {
     // init interrupt descriptor table
     init_idt();
 
-    
+    process_t* init_proc = process_create(init_main);
 
-    //volatile uint16_t *vga = (volatile uint16_t *)0xB8000;
-    //vga[0] = (0x0F << 8) | '1';
+    tss_entry.esp0 = (uint32_t)init_proc->kernel_stack;
 
-    uint32_t user_esp = (uint32_t)user_stack + sizeof(user_stack);
-
-    enter_usermode((uint32_t)&user_main, user_esp);
+    start_first_process(init_proc->esp);
 
     // hold cpu
     while (1) asm volatile("hlt");

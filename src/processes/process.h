@@ -3,11 +3,14 @@
 
 // max number of processes that can exist at once
 #define MAX_PROCESSES 16
+// size of user and kernel stacks for processes
+#define STACK_SIZE 4096
 
 #include "definitions.h"
 
 // different process states
 typedef enum {
+    UNUSED,
     PROCESS_READY,
     PROCESS_RUNNING,
     PROCESS_BLOCKED,
@@ -31,20 +34,17 @@ typedef struct cpu_context_t {
 
 // process data
 typedef struct process_t {
-    int pid;
+    uint32_t pid;
     process_state_t state;
+
+    uint32_t esp;
+    uint8_t* kernel_stack;
+    uint8_t* user_stack;
+
     cpu_context_t context;
 } process_t;
 
-//global processes array
-extern process_t processes[MAX_PROCESSES];
-// number of active processes
-extern int active_processes;
-
 // process functions
-process_t* process_create(void);
-void process_exit(process_t* process);
-int process_wait(process_t* process);
-int process_exec(process_t* process);
+process_t* process_create(void (*entry_point)(void));
 
 #endif
