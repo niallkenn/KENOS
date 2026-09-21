@@ -1,22 +1,37 @@
 #include "interrupts.h"
 #include "syscall.h"
+#include "process.h"
 
 // interupt handler dispatcher definition
-void interrupt_handler(registers_t* registers) {
+registers_t* interrupt_handler(registers_t* registers) {
     uint32_t vector = registers->interrupt_number;
+
+    if (current_process != NULL) {
+        current_process->esp = (uint32_t)registers;
+    }
+
+    registers_t* return_registers = registers;
     
     if (vector == 0x80) {
-        handle_syscall(registers);
+        return_registers = handle_syscall(registers);
+    }
+
+    if (vector < 32) {
+        // exception
     }
     
-    asm volatile("cli");
-    for(;;) asm volatile("hlt");
+    return return_registers;
 }
 
-void handle_syscall(registers_t* registers) {
+registers_t* handle_syscall(registers_t* registers) {
     uint32_t syscall_number = registers->eax;
     
     if (syscall_number == 1) {
-        sys_write(registers->ebx, (const char*)registers->ecx, registers->edx);
+        registers->eax = sys_write(registers->ebx, (const char*)registers->ecx, registers->edx);
+        return registers;
+    } else if (syscall_number == 2) {
+        return sys_yield(registers);
     }
+
+    return registers;
 }

@@ -13,4 +13,6 @@ start_first_process:
 
     popa
 
+    addl $8, %esp
+
     iret

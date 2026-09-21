@@ -1,10 +1,12 @@
 #include "process.h"
 
 // initialise
-static process_t processes[MAX_PROCESSES];
-static uint8_t kernel_stacks[MAX_PROCESSES][STACK_SIZE];
-static uint8_t user_stacks[MAX_PROCESSES][STACK_SIZE];
-static int next_pid = 1;
+process_t processes[MAX_PROCESSES];
+uint8_t kernel_stacks[MAX_PROCESSES][STACK_SIZE];
+uint8_t user_stacks[MAX_PROCESSES][STACK_SIZE];
+int next_pid = 1;
+
+process_t* current_process = NULL;
 
 process_t* process_create(void (*entry_point)(void)) {
     int slot = -1;
@@ -35,6 +37,9 @@ process_t* process_create(void (*entry_point)(void)) {
     *(--sp) = 0x1B;
     *(--sp) = (uint32_t)entry_point;
 
+    // interrupt vector and error code
+    for (int i = 0; i < 2; i++) *(--sp) = 0;
+
     // eax, ecx, edx, ebx, esp, ebp, esi, edi
     for (int i = 0; i < 8; i++) *(--sp) = 0;
 
@@ -46,3 +51,8 @@ process_t* process_create(void (*entry_point)(void)) {
     return process;
 }
 
+void processes_init() {
+    for (int i = 0; i < MAX_PROCESSES; i++) {
+        processes[i].state = UNUSED;
+    }
+}

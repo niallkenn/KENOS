@@ -39,12 +39,17 @@ typedef struct process_t {
 
     uint32_t esp;
     uint8_t* kernel_stack;
-    uint8_t* user_stack;
 
-    cpu_context_t context;
+    uint8_t* user_stack;
 } process_t;
+
+extern process_t processes[MAX_PROCESSES];
+extern uint8_t kernel_stacks[MAX_PROCESSES][STACK_SIZE];
+extern uint8_t user_stacks[MAX_PROCESSES][STACK_SIZE];
+extern int next_pid;
 
 // process functions
 process_t* process_create(void (*entry_point)(void));
-
+void processes_init();
+extern process_t* current_process;
 #endif

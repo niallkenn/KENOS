@@ -11,3 +11,12 @@ int write(uint32_t file_descriptor, const char* string, uint32_t length) {
     );
     return ret;
 }
+
+void yield(void) {
+    asm volatile(
+        "int $0x80"
+        :
+        : "a" (SYS_YIELD)
+        : "memory"
+    );
+}

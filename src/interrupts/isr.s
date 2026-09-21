@@ -59,6 +59,7 @@ ISR_NO_ERR_CODE 128
 
 # common cleanup for interrupt handlers
 interrupt_common:
+    # cpu pushes ss, useresp, eflags, cs, eip
     pushal
 
     pushl %ds
@@ -77,7 +78,7 @@ interrupt_common:
 
     call interrupt_handler
 
-    add $4, %esp
+    movl %eax, %esp
 
     popl %gs
     popl %fs
