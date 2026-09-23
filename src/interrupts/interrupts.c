@@ -26,11 +26,16 @@ registers_t* interrupt_handler(registers_t* registers) {
 registers_t* handle_syscall(registers_t* registers) {
     uint32_t syscall_number = registers->eax;
     
-    if (syscall_number == 1) {
+    if (syscall_number == SYS_WRITE) {
         registers->eax = sys_write(registers->ebx, (const char*)registers->ecx, registers->edx);
         return registers;
-    } else if (syscall_number == 2) {
+    } else if (syscall_number == SYS_YIELD) {
         return sys_yield(registers);
+    } else if (syscall_number == SYS_GETPID) {
+        registers->eax = sys_getpid();
+        return registers;
+    } else if (syscall_number == SYS_EXIT) {
+        return sys_exit(registers);
     }
 
     return registers;

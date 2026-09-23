@@ -10,10 +10,9 @@
 
 // different process states
 typedef enum {
-    UNUSED,
+    PROCESS_UNUSED,
     PROCESS_READY,
     PROCESS_RUNNING,
-    PROCESS_BLOCKED,
     PROCESS_TERMINATED
 } process_state_t;
 

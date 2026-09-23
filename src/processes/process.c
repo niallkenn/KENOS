@@ -11,7 +11,7 @@ process_t* current_process = NULL;
 process_t* process_create(void (*entry_point)(void)) {
     int slot = -1;
     for (int i = 0; i < MAX_PROCESSES; i++) {
-        if (processes[i].state == UNUSED) {
+        if (processes[i].state == PROCESS_UNUSED || processes[i].state == PROCESS_TERMINATED) {
             slot = i;
             break;
         }
@@ -53,6 +53,6 @@ process_t* process_create(void (*entry_point)(void)) {
 
 void processes_init() {
     for (int i = 0; i < MAX_PROCESSES; i++) {
-        processes[i].state = UNUSED;
+        processes[i].state = PROCESS_UNUSED;
     }
 }

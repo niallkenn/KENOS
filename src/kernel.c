@@ -7,24 +7,24 @@
 extern void start_first_process(uint32_t esp);
 
 void init_main(void) {
-    write(1, "HELLO FROM PID 1, INIT ", 24);
-    
-    while (1) {yield();}
-}
-
-void please_work(void) {
     while (1) {
-        write(1, "1", 2);
         yield();
     }
 }
 
-void work2(void) {
-    while (1) {
-        write(1, "2", 2);
-        yield();
-    }
+void prog1(void) {
+    const char* string = "pid"
+    ;
+    write(1, '0' + getpid(), 1);
+    exit();
 }
+
+void prog2(void) {
+    const char* string = "pid";
+    write(1, string + '0' + getpid(), 4);
+    exit();
+}
+
 // main kernel function
 void kernel_main() {
     init_gdt();
@@ -34,8 +34,8 @@ void kernel_main() {
     processes_init();
 
     process_t* init_proc = process_create(init_main);
-    process_t* please = process_create(please_work);
-    process_t* please2 = process_create(work2);
+    process_t* proc1 = process_create(prog1);
+    process_t* proc2 = process_create(prog2);
     current_process = init_proc;
 
     tss_entry.esp0 = (uint32_t)init_proc->kernel_stack;

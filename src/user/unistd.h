@@ -5,4 +5,6 @@
 
 extern int write(uint32_t file_descriptor, const char* string, uint32_t length);
 extern void yield(void);
+extern int getpid(void);
+extern void exit(void);
 #endif

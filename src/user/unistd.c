@@ -20,3 +20,22 @@ void yield(void) {
         : "memory"
     );
 }
+
+int getpid(void) {
+    int ret;
+    asm volatile(
+        "int $0x80"
+        : "=a" (ret)
+        : "a" (SYS_GETPID)
+        : "memory"
+    );
+    return ret;
+}
+
+void exit(void) {
+    asm volatile(
+        "int $0x80"
+        :
+        : "a" (SYS_EXIT)
+    );
+}
