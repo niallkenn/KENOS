@@ -6,6 +6,9 @@ uint8_t kernel_stacks[MAX_PROCESSES][STACK_SIZE];
 uint8_t user_stacks[MAX_PROCESSES][STACK_SIZE];
 int next_pid = 1;
 
+process_t idle_process;
+uint8_t idle_stack[STACK_SIZE];
+
 process_t* current_process = NULL;
 
 process_t* process_create(void (*entry_point)(void)) {
@@ -49,6 +52,31 @@ process_t* process_create(void (*entry_point)(void)) {
     process->esp = (uint32_t)sp;
 
     return process;
+}
+
+void idle_create(void) {
+    idle_process.pid = 0;
+    idle_process.state = PROCESS_READY;
+    idle_process.kernel_stack = &idle_stack[STACK_SIZE];
+    idle_process.user_stack = NULL;
+
+    uint32_t* sp = (uint32_t*)idle_process.kernel_stack;
+
+    *(--sp) = 0x10;
+    *(--sp) = (uint32_t)idle_process.user_stack;
+    *(--sp) = 0x202;
+    *(--sp) = 0x08;
+    *(--sp) = (uint32_t)idle;
+
+    for (int i = 0; i < 2; i++) *(--sp) = 0;   // vector + error code
+    for (int i = 0; i < 8; i++) *(--sp) = 0;   // pusha
+    for (int i = 0; i < 4; i++) *(--sp) = 0x10; // ds, es, fs, gs = kernel data
+
+    idle_process.esp = (uint32_t)sp;
+}
+
+void idle(void) {
+    while(1) asm volatile("sti; hlt");
 }
 
 void processes_init() {

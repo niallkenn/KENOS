@@ -66,6 +66,9 @@ void init_idt(){
     // set gate for syscall isr 0x80, 0xEE -> 0x8E | ring 3
     set_gate(0x80, (uint32_t)isr128, KERNEL_CODE_SELECTOR, 0xEE);
 
+    // irq0, pit
+    set_gate(32, (uint32_t)isr32, 0x08, 0x8E);
+
     // load the idtr
     load_idt(&idtr);
 }

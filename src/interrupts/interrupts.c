@@ -1,6 +1,7 @@
 #include "interrupts.h"
 #include "syscall.h"
 #include "process.h"
+#include "irq.h"
 
 // interupt handler dispatcher definition
 registers_t* interrupt_handler(registers_t* registers) {
@@ -9,18 +10,20 @@ registers_t* interrupt_handler(registers_t* registers) {
     if (current_process != NULL) {
         current_process->esp = (uint32_t)registers;
     }
-
-    registers_t* return_registers = registers;
     
     if (vector == 0x80) {
-        return_registers = handle_syscall(registers);
+        return handle_syscall(registers);
     }
 
     if (vector < 32) {
-        // exception
+        return registers;
+    }
+
+    if (vector >= 32) {
+        return handle_irq(registers);
     }
     
-    return return_registers;
+    return registers;
 }
 
 registers_t* handle_syscall(registers_t* registers) {

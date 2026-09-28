@@ -46,9 +46,13 @@ extern process_t processes[MAX_PROCESSES];
 extern uint8_t kernel_stacks[MAX_PROCESSES][STACK_SIZE];
 extern uint8_t user_stacks[MAX_PROCESSES][STACK_SIZE];
 extern int next_pid;
+extern process_t idle_process;
+extern uint8_t idle_stack[STACK_SIZE];
 
 // process functions
 process_t* process_create(void (*entry_point)(void));
-void processes_init();
+extern void processes_init();
+extern void idle_create(void);
 extern process_t* current_process;
+extern void idle(void);
 #endif

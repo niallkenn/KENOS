@@ -56,6 +56,8 @@ ISR_NO_ERR_CODE 31
 
 # syscall isr 0x80
 ISR_NO_ERR_CODE 128
+# irq0, pit
+ISR_NO_ERR_CODE 32
 
 # common cleanup for interrupt handlers
 interrupt_common:

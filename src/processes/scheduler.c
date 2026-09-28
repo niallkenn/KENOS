@@ -20,6 +20,5 @@ process_t* scheduler_get_next() {
         return current_process;
     }
 
-    // Ultimate fallback: Everything is blocked (you'll need an idle process here later!)
-    return NULL; 
+    return &idle_process;
 }
