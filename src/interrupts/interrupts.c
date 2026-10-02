@@ -38,7 +38,7 @@ registers_t* handle_syscall(registers_t* registers) {
         registers->eax = sys_getpid();
         return registers;
     } else if (syscall_number == SYS_EXIT) {
-        return sys_exit(registers);
+        return sys_exit();
     }
 
     return registers;

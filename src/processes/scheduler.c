@@ -1,23 +1,29 @@
 #include "scheduler.h"
 
-static int current_index = 0;
+const int time_slice[NUM_QUEUES] = {4, 8, 16};
+static int ticks_since_boost = 0;
+static int last_scheduled_index = -1;
 
 process_t* scheduler_get_next() {
-    // Start searching from the next slot in the array
-    int index = (current_index + 1) % MAX_PROCESSES;
-
-    for (int i = 0; i < MAX_PROCESSES; i++) {
-        int check_slot = (index + i) % MAX_PROCESSES;
-        
-        if (processes[check_slot].state == PROCESS_READY) {
-            current_index = check_slot; // Remember this slot for next time
-            return &processes[check_slot];
+    ticks_since_boost++;
+    if (++ticks_since_boost >= BOOST_INTERVAL) {
+        ticks_since_boost = 0;
+        for (int i = 0; i < MAX_PROCESSES; i++) {
+            if (processes[i].state == PROCESS_READY || processes[i].state == PROCESS_RUNNING) {
+                processes[i].priority = 0;
+                processes[i].ticks_in_slice = 0;
+            }
         }
     }
 
-    // Fallback: If no other process is ready, try to keep running the current one
-    if (current_process && current_process->state == PROCESS_READY) {
-        return current_process;
+    for (int q = 0; q < NUM_QUEUES; q++) {
+        for (int i = 0; i < MAX_PROCESSES; i++) {
+            int idx = (last_scheduled_index + 1 + i) % MAX_PROCESSES;
+            if (processes[idx].state == PROCESS_READY && processes[idx].priority == q) {
+                last_scheduled_index = idx;
+                return &processes[idx];
+            }
+        }
     }
 
     return &idle_process;

@@ -24,6 +24,9 @@ process_t* process_create(void (*entry_point)(void)) {
     process_t* process = &processes[slot];
     process->pid = next_pid++;
     process->state = PROCESS_READY;
+    process->priority = 0;
+    process->ticks_in_slice = 0;
+    process->total_ticks = 0;
 
     uint8_t* kernel_stack = &kernel_stacks[slot][STACK_SIZE];
     uint8_t* user_stack = &user_stacks[slot][STACK_SIZE];

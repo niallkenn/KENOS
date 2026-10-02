@@ -38,8 +38,11 @@ typedef struct process_t {
 
     uint32_t esp;
     uint8_t* kernel_stack;
-
     uint8_t* user_stack;
+
+    int priority;
+    int ticks_in_slice;
+    int total_ticks;
 } process_t;
 
 extern process_t processes[MAX_PROCESSES];

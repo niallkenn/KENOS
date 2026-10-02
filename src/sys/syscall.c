@@ -12,6 +12,11 @@ extern int sys_write(uint32_t file_descriptor, const char* string, uint32_t leng
         volatile uint16_t* vga = (volatile uint16_t*)0xB8000;
         for (uint32_t i = 0; i < length; i++) {
             if (index >= VGA_COLS * VGA_ROWS) index = 0;
+            if (string[i] == '\n') {
+                index += 80;
+                index -= index % 80;
+                continue;
+            }
             vga[index++] = (0x0F << 8) | string[i];
         }
         return length;
@@ -21,11 +26,15 @@ extern int sys_write(uint32_t file_descriptor, const char* string, uint32_t leng
 }
 
 extern registers_t* sys_yield(registers_t* registers) {
-    current_process->state = PROCESS_READY;
-    current_process->esp = (uint32_t)registers;
+    if (current_process != NULL && current_process != &idle_process) {
+        current_process->state = PROCESS_READY;
+        current_process->esp = (uint32_t)registers;
+    }
+
     process_t* next_process = scheduler_get_next();
 
     current_process = next_process;
+    current_process->state = PROCESS_RUNNING;
 
     tss_entry.esp0 = (uint32_t)next_process->kernel_stack;
 
