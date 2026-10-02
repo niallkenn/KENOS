@@ -2,22 +2,12 @@
 #include "process.h"
 #include "gdt.h"
 #include "scheduler.h"
+#include "terminal.h"
 
-#define VGA_ROWS 25
-#define VGA_COLS 80
-
-static uint32_t index = 0;
 extern int sys_write(uint32_t file_descriptor, const char* string, uint32_t length) {
     if (file_descriptor == 1 || file_descriptor == 2) {
-        volatile uint16_t* vga = (volatile uint16_t*)0xB8000;
         for (uint32_t i = 0; i < length; i++) {
-            if (index >= VGA_COLS * VGA_ROWS) index = 0;
-            if (string[i] == '\n') {
-                index += 80;
-                index -= index % 80;
-                continue;
-            }
-            vga[index++] = (0x0F << 8) | string[i];
+            put_char(string[i], WHITE, BLACK);
         }
         return length;
     }   

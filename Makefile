@@ -9,7 +9,8 @@ CC_FLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra \
 	-I$(SRC_DIR)/interrupts \
 	-I$(SRC_DIR)/gdt \
 	-I$(SRC_DIR)/user \
-	-I$(SRC_DIR)/boot
+	-I$(SRC_DIR)/boot \
+	-I$(SRC_DIR)/drivers
 
 LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
 

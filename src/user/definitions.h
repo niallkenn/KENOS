@@ -1,9 +1,17 @@
 #ifndef DEFINITIONSH
 #define DEFINITIONSH
 
+#include "stdlib.h"
+
 #define NULL ((void *)0)
 #define true 1
 #define false 0
+
+#define WHITE COLOR_RGB(255, 255, 255)
+#define BLACK COLOR_RGB(0, 0, 0)
+#define RED COLOR_RGB(255, 0, 0)
+#define GREEN COLOR_RGB(0, 255, 0)
+#define BLUE COLOR_RGB(0, 0, 255)
 
 typedef  _Bool bool;
 
