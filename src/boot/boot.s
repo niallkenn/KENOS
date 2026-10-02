@@ -1,7 +1,8 @@
 # Constants for multiboot header
 .set ALIGN, 1<<0
 .set MEM_INFO, 1<<1
-.set FLAGS, ALIGN | MEM_INFO
+.set VIDEO_MODE, 1<<2
+.set FLAGS, ALIGN | MEM_INFO | VIDEO_MODE
 .set MAGIC, 0x1BADB002
 .set CHECKSUM,  -(MAGIC + FLAGS)
 
@@ -11,6 +12,17 @@
 .long MAGIC
 .long FLAGS
 .long CHECKSUM
+
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+
+.long 0
+.long 1024
+.long 768
+.long 32
 
 # Set up stack
 .section .bss
@@ -26,6 +38,10 @@ stack_top:
 _start:
     # Set stack pointer
     mov $stack_top, %esp
+
+    # push multiboot info and the magic value, ebx and eax
+    push %ebx
+    push %eax
 
     # Call kernel main
     call kernel_main
