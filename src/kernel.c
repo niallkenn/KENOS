@@ -5,11 +5,16 @@
 #include "process.h"
 #include "pic.h"
 #include "pit.h"
+#include "stdlib.h"
 
 extern void start_first_process(uint32_t esp);
 
 void init_main(void) {
-    write(1, "HELLO FROM PID 1, INIT ", 23);
+    write(1, "HELLO FROM PID ", 15);
+    char* pid = NULL;
+    itoa(getpid(), pid);
+    write(1, pid, strlen(pid));
+    write(1, "!", 1);
     
     exit();
 }
