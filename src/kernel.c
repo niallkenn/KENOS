@@ -29,7 +29,7 @@ void run(void) {
         char pid[12];
         itoa(getpid(), pid);
         write(1, pid, strlen(pid));
-        for (volatile int i = 0; i < 10000000; i++) {}
+        for (volatile int i = 0; i < 100000000; i++) {}
     }
 }
 
@@ -39,7 +39,7 @@ void run1(void) {
         char pid[12];
         itoa(getpid(), pid);
         write(1, pid, strlen(pid));
-        for (volatile int i = 0; i < 10000000; i++) {}
+        for (volatile int i = 0; i < 100000000; i++) {}
 
     }
 }
@@ -62,8 +62,8 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbinfo) {
     idle_create();
 
     process_t* init_proc = process_create(init_main);
-    process_create(run);
-    process_create(run1);
+    //process_create(run);
+    //process_create(run1);
 
     current_process = init_proc;
     tss_entry.esp0 = (uint32_t)init_proc->kernel_stack;

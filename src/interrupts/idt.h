@@ -65,6 +65,8 @@ extern void isr128();
 
 // irq0
 extern void isr32();
+// irq1
+extern void isr33();
 
 // lidt asm wrapper
 void load_idt(idtr_t* idtr);

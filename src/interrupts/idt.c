@@ -67,7 +67,9 @@ void init_idt(){
     set_gate(0x80, (uint32_t)isr128, KERNEL_CODE_SELECTOR, 0xEE);
 
     // irq0, pit
-    set_gate(32, (uint32_t)isr32, 0x08, 0x8E);
+    set_gate(32, (uint32_t)isr32, KERNEL_CODE_SELECTOR, 0x8E);
+    // irq1, keyboard
+    set_gate(33, (uint32_t)isr33, KERNEL_CODE_SELECTOR, 0x8E);
 
     // load the idtr
     load_idt(&idtr);

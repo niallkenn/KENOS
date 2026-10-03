@@ -6,49 +6,64 @@
 static int cursor_x = 0;
 static int cursor_y = 0;
 
-void put_char(char c, uint32_t fg, uint32_t bg) {
-    uint32_t* fb = (uint32_t*)(uintptr_t)mb_info->framebuffer_addr;
-    uint32_t pitch = mb_info->framebuffer_pitch / 4;
+void terminal_put_char(char c, uint32_t fg, uint32_t bg) {
+    if (cursor_y >= mb_info->framebuffer_height) {
+        cursor_x = 0;
+        cursor_y = 0;
+        terminal_clear(bg);
+    }
 
     if (c == '\n') {
         cursor_x = 0;
         cursor_y += FONT_HEIGHT;
-    } else {
-        const uint8_t* glyph = font8x16[(uint8_t)c];
+        return;
+    }
 
-        for (int cy = 0; cy < FONT_HEIGHT; cy++) {
-            uint8_t row = glyph[cy];
-            for (int cx = 0; cx < FONT_WIDTH; cx++) {
-                if (row & (1 << (7 - cx))) {
-                    fb[(cursor_y + cy) * pitch + (cursor_x + cx)] = fg;
-                } else {
-                    fb[(cursor_y + cy) * pitch + (cursor_x + cx)] = bg;
-                }
+    if (c == '\t') {
+        terminal_put_char(' ', fg, bg);
+        terminal_put_char(' ', fg, bg);
+        return;
+    }
+
+    if (cursor_x + FONT_WIDTH > mb_info->framebuffer_width) {
+        cursor_x = 0;
+        cursor_y += FONT_HEIGHT;
+    }
+
+    terminal_draw_char(c, cursor_x, cursor_y, fg, bg);
+    cursor_x += FONT_WIDTH;
+}
+
+void terminal_draw_char(char c, int x, int y, uint32_t fg, uint32_t bg) {
+    if (x < 0 || (x + FONT_WIDTH) > mb_info->framebuffer_width ||
+    y < 0 || (y + FONT_HEIGHT) > mb_info->framebuffer_height) return;
+
+    uint32_t* fb = (uint32_t*)(uintptr_t)mb_info->framebuffer_addr;
+    uint32_t pitch = mb_info->framebuffer_pitch / 4;
+
+    const uint8_t* glyph = font8x16[(uint8_t)c];
+
+    for (int cy = 0; cy < FONT_HEIGHT; cy++) {
+        uint8_t row = glyph[cy];
+        for (int cx = 0; cx < FONT_WIDTH; cx++) {
+            if (row & (1 << (7 - cx))) {
+                fb[(y + cy) * pitch + (x + cx)] = fg;
+            } else {
+                fb[(y + cy) * pitch + (x + cx)] = bg;
             }
         }
-
-        cursor_x += FONT_WIDTH;
-        if ((uint32_t)(cursor_x + FONT_WIDTH) > mb_info->framebuffer_width) {
-            cursor_x = 0;
-            cursor_y += FONT_HEIGHT;
-        }
-    }
-
-    if ((uint32_t)(cursor_y + FONT_HEIGHT) > mb_info->framebuffer_height) {
-        cursor_x = 0;
-        cursor_y = 0;
-        clear(bg);
     }
 }
 
-void print(const char* str, uint32_t fg, uint32_t bg) {
+
+void terminal_print(const char* str, uint32_t fg, uint32_t bg) {
     int i = 0;
     while (str[i] != '\0') {
-        put_char(str[i++], fg, bg);
+        terminal_put_char(str[i++], fg, bg);
     }
 }
 
-void clear(uint32_t bg) {
+void terminal_clear(uint32_t bg) {
     uint32_t* fb = (uint32_t*)(uintptr_t)mb_info->framebuffer_addr;
     uint32_t pitch = mb_info->framebuffer_pitch / 4;
 
@@ -57,4 +72,16 @@ void clear(uint32_t bg) {
             fb[y * pitch + x] = bg;
         }
     }
+}
+
+void terminal_backspace() {
+    if (cursor_x == 0  && cursor_y == 0) return;
+
+    if (cursor_x == 0) {
+        cursor_y -= FONT_HEIGHT;
+        cursor_x = FONT_WIDTH * (mb_info->framebuffer_width / FONT_WIDTH - 1);
+    } else cursor_x -= FONT_WIDTH;
+
+    terminal_put_char(' ', WHITE, BLACK);
+    cursor_x -= FONT_WIDTH;
 }

@@ -7,7 +7,7 @@
 extern int sys_write(uint32_t file_descriptor, const char* string, uint32_t length) {
     if (file_descriptor == 1 || file_descriptor == 2) {
         for (uint32_t i = 0; i < length; i++) {
-            put_char(string[i], WHITE, BLACK);
+            terminal_put_char(string[i], WHITE, BLACK);
         }
         return length;
     }   

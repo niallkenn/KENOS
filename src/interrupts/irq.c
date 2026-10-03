@@ -4,6 +4,8 @@
 #include "pit.h"
 #include "unistd.h"
 #include "syscall.h"
+#include "keyboard.h"
+#include "terminal.h"
 
 registers_t* handle_irq(registers_t* registers) {
     int irq = registers->interrupt_number - 32;
@@ -30,6 +32,18 @@ registers_t* handle_irq(registers_t* registers) {
             return sys_yield(registers);
         }
         
+        return registers;
+    } else if (irq == 1) {
+        char c = keyboard_get_char();
+
+        if (c) {
+            if (c == '\b') {
+                terminal_backspace();
+            } else {
+                terminal_put_char(c, WHITE, BLACK);
+            }
+        }
+        pic_send_eoi(1);
         return registers;
     }
     

@@ -58,6 +58,8 @@ ISR_NO_ERR_CODE 31
 ISR_NO_ERR_CODE 128
 # irq0, pit
 ISR_NO_ERR_CODE 32
+# irq1, keyboard
+ISR_NO_ERR_CODE 33
 
 # common cleanup for interrupt handlers
 interrupt_common:
