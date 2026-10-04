@@ -9,6 +9,8 @@
 #include "scheduler.h"
 #include "multiboot.h"
 #include "terminal.h"
+#include "memorymap.h"
+#include "frameallocator.h"
 
 extern void start_first_process(uint32_t esp);
 
@@ -19,8 +21,11 @@ void init_main(void) {
     char pid[12];
     itoa(getpid(), pid);
     write(1, pid, strlen(pid));
-    write(1, "!", 1);
-    
+    write(1, "!\n", 2);
+
+    void* ptr = fa_allocate();
+    fa_free(ptr);
+
     exit();
 }
 
@@ -31,6 +36,15 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbinfo) {
     if (mbinfo->flags & (1 << 12)) {
         mb_info = mbinfo;
     } else return;
+
+    static uint32_t mmap_addr = 0;
+    static uint32_t mmap_length = 0;
+    if (mb_info->flags & (1 << 6)) {
+        mmap_addr = mb_info->mmap_addr;
+        mmap_length = mb_info->mmap_length;
+    } else return;
+
+    init_mmap(mmap_addr, mmap_length);
 
     init_gdt();
     // init interrupt descriptor table
