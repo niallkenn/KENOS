@@ -1,9 +1,13 @@
 #include "keyboard.h"
 #include "portio.h"
+#include "pic.h"
 
 bool keyboard_shift_pressed = false;
 bool keyboard_caps_lock = false;
 uint8_t keyboard_last_scancode = 0;
+
+static char keyboard_buffer[KEYBOARD_BUFFER_SIZE];
+static volatile uint32_t keyboard_head = 0, keyboard_tail = 0;
 
 char keyboard_get_char(void) {
     uint8_t scancode = inb(0x60);
@@ -40,6 +44,30 @@ char keyboard_get_char(void) {
     if (keyboard_shift_pressed) return upper;
 
     return lower;
+}
+
+registers_t* irq1_handler(registers_t* registers) {
+    char c = keyboard_get_char();
+    if (c) {
+        uint32_t next = (keyboard_head + 1) % KEYBOARD_BUFFER_SIZE;
+        if (next != keyboard_tail) {
+            keyboard_buffer[keyboard_head] = c;
+            keyboard_head = next;
+        }
+    }
+
+    pic_send_eoi(1);
+    return registers;
+}
+
+int keyboard_read_char(void) {
+    if (keyboard_tail == keyboard_head) return -1;
+
+    char c = keyboard_buffer[keyboard_tail];
+
+    keyboard_tail = (keyboard_tail + 1) % KEYBOARD_BUFFER_SIZE;
+
+    return (int)c;
 }
 
 const char keyboard_scancode_map_lower[128] = {

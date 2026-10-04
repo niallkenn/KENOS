@@ -39,3 +39,17 @@ void exit(void) {
         : "a" (SYS_EXIT)
     );
 }
+
+int getchar(void) {
+    int c;
+    do {
+        asm volatile(
+            "int $0x80"
+            : "=a" (c)
+            : "a" (SYS_GETCHAR)
+            : "memory"
+        );
+        if (c < 0) yield();
+    } while (c < 0);
+    return c;
+}

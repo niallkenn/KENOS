@@ -8,6 +8,7 @@
 #include "stdlib.h"
 #include "scheduler.h"
 #include "multiboot.h"
+#include "terminal.h"
 
 extern void start_first_process(uint32_t esp);
 
@@ -21,27 +22,6 @@ void init_main(void) {
     write(1, "!", 1);
     
     exit();
-}
-
-void run(void) {
-    while (1) {
-        write(1, "\npid ", 5);
-        char pid[12];
-        itoa(getpid(), pid);
-        write(1, pid, strlen(pid));
-        for (volatile int i = 0; i < 100000000; i++) {}
-    }
-}
-
-void run1(void) {
-    while (1) {
-        write(1, "\npid ", 5);
-        char pid[12];
-        itoa(getpid(), pid);
-        write(1, pid, strlen(pid));
-        for (volatile int i = 0; i < 100000000; i++) {}
-
-    }
 }
 
 // main kernel function
@@ -62,8 +42,7 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbinfo) {
     idle_create();
 
     process_t* init_proc = process_create(init_main);
-    //process_create(run);
-    //process_create(run1);
+    process_create(terminal_main);
 
     current_process = init_proc;
     tss_entry.esp0 = (uint32_t)init_proc->kernel_stack;

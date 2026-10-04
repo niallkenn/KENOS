@@ -39,6 +39,9 @@ registers_t* handle_syscall(registers_t* registers) {
         return registers;
     } else if (syscall_number == SYS_EXIT) {
         return sys_exit();
+    } else if (syscall_number == SYS_GETCHAR) {
+        registers->eax = (uint32_t)sys_getchar();
+        return registers;
     }
 
     return registers;

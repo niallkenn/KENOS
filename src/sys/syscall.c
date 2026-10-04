@@ -3,11 +3,16 @@
 #include "gdt.h"
 #include "scheduler.h"
 #include "terminal.h"
+#include "keyboard.h"
 
 extern int sys_write(uint32_t file_descriptor, const char* string, uint32_t length) {
     if (file_descriptor == 1 || file_descriptor == 2) {
         for (uint32_t i = 0; i < length; i++) {
-            terminal_put_char(string[i], WHITE, BLACK);
+            if (string[i] == '\b') {
+                terminal_backspace();
+            } else {
+                terminal_put_char(string[i], WHITE, BLACK);
+            }
         }
         return length;
     }   
@@ -45,4 +50,8 @@ extern registers_t* sys_exit() {
     tss_entry.esp0 = (uint32_t)next_process->kernel_stack;
 
     return (registers_t*)next_process->esp;
+}
+
+extern int sys_getchar(void) {
+    return keyboard_read_char();
 }

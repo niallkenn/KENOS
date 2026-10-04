@@ -2,12 +2,13 @@
 #include "multiboot.h"
 #include "font.h"
 #include "stdlib.h"
+#include "unistd.h"
 
 static int cursor_x = 0;
 static int cursor_y = 0;
 
 void terminal_put_char(char c, uint32_t fg, uint32_t bg) {
-    if (cursor_y >= mb_info->framebuffer_height) {
+    if ((uint32_t)cursor_y >= mb_info->framebuffer_height) {
         cursor_x = 0;
         cursor_y = 0;
         terminal_clear(bg);
@@ -25,7 +26,7 @@ void terminal_put_char(char c, uint32_t fg, uint32_t bg) {
         return;
     }
 
-    if (cursor_x + FONT_WIDTH > mb_info->framebuffer_width) {
+    if ((uint32_t)(cursor_x + FONT_WIDTH) > mb_info->framebuffer_width) {
         cursor_x = 0;
         cursor_y += FONT_HEIGHT;
     }
@@ -35,8 +36,8 @@ void terminal_put_char(char c, uint32_t fg, uint32_t bg) {
 }
 
 void terminal_draw_char(char c, int x, int y, uint32_t fg, uint32_t bg) {
-    if (x < 0 || (x + FONT_WIDTH) > mb_info->framebuffer_width ||
-    y < 0 || (y + FONT_HEIGHT) > mb_info->framebuffer_height) return;
+    if (x < 0 || (uint32_t)(x + FONT_WIDTH) > mb_info->framebuffer_width ||
+    y < 0 || (uint32_t)(y + FONT_HEIGHT) > mb_info->framebuffer_height) return;
 
     uint32_t* fb = (uint32_t*)(uintptr_t)mb_info->framebuffer_addr;
     uint32_t pitch = mb_info->framebuffer_pitch / 4;
@@ -74,7 +75,7 @@ void terminal_clear(uint32_t bg) {
     }
 }
 
-void terminal_backspace() {
+void terminal_backspace(void) {
     if (cursor_x == 0  && cursor_y == 0) return;
 
     if (cursor_x == 0) {
@@ -82,6 +83,14 @@ void terminal_backspace() {
         cursor_x = FONT_WIDTH * (mb_info->framebuffer_width / FONT_WIDTH - 1);
     } else cursor_x -= FONT_WIDTH;
 
-    terminal_put_char(' ', WHITE, BLACK);
+    terminal_put_char(' ', WHITE, BLACK); // this should call write as it comes from ring3
     cursor_x -= FONT_WIDTH;
+}
+
+void terminal_main(void) {
+    while (1) {
+        int c = getchar();
+        char ch = (char)c;
+        write(1, &ch, 1);
+    }
 }

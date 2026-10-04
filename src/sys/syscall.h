@@ -9,6 +9,7 @@ typedef enum {
     SYS_YIELD = 2,
     SYS_GETPID = 3,
     SYS_EXIT = 4,
+    SYS_GETCHAR = 5,
     MAX_SYSCALLS
 } syscall_number_t;
 
@@ -16,4 +17,5 @@ extern int sys_write(uint32_t file_descriptor, const char* string, uint32_t leng
 extern registers_t* sys_yield(registers_t* registers);
 extern int sys_getpid(void);
 extern registers_t* sys_exit();
+extern int sys_getchar(void);
 #endif
