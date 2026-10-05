@@ -16,7 +16,8 @@ registers_t* interrupt_handler(registers_t* registers) {
     }
 
     if (vector < 32) {
-        return registers;
+        asm volatile("cli");
+        asm volatile("hlt");
     }
 
     if (vector >= 32) {

@@ -7,8 +7,6 @@ void init_mmap(uint32_t mmap_addr, uint32_t mmap_length) {
     uint32_t offset = 0;
     mmap_count = 0;
 
-    mmap_entry_t* entry = (mmap_entry_t*)mmap_addr;
-
     while (offset < mmap_length && mmap_count < MMAP_MAX_ENTRIES) {
         uint32_t entry_size = *(uint32_t*)(mmap_addr + offset);
         grub__mmap_entry_t* raw = (grub__mmap_entry_t*)(mmap_addr + offset + 4);

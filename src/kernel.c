@@ -11,6 +11,7 @@
 #include "terminal.h"
 #include "memorymap.h"
 #include "frameallocator.h"
+#include "paging.h"
 
 extern void start_first_process(uint32_t esp);
 
@@ -23,9 +24,6 @@ void init_main(void) {
     write(1, pid, strlen(pid));
     write(1, "!\n", 2);
 
-    void* ptr = fa_allocate();
-    fa_free(ptr);
-
     exit();
 }
 
@@ -37,18 +35,31 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbinfo) {
         mb_info = mbinfo;
     } else return;
 
+    
     static uint32_t mmap_addr = 0;
     static uint32_t mmap_length = 0;
     if (mb_info->flags & (1 << 6)) {
         mmap_addr = mb_info->mmap_addr;
         mmap_length = mb_info->mmap_length;
     } else return;
-
+    
     init_mmap(mmap_addr, mmap_length);
-
+    
     init_gdt();
-    // init interrupt descriptor table
     init_idt();
+    
+    init_fa();
+
+    init_paging();
+
+    uint32_t fb_phys = (uint32_t)mb_info->framebuffer_addr;
+    uint32_t fb_size = mb_info->framebuffer_pitch * mb_info->framebuffer_height;
+    uint32_t fb_pages = (fb_size + PAGE_SIZE - 1) / PAGE_SIZE;
+
+    for (uint32_t i = 0; i < fb_pages; i++) {
+        paging_map_page(fb_phys + i * PAGE_SIZE, fb_phys + i * PAGE_SIZE, PRESENT | WRITABLE);
+    }
+
     pic_remap();
     init_pit(1000);
 
