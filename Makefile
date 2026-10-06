@@ -4,7 +4,10 @@ LD = i386-elf-gcc
 CC_FLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra \
 	-I$(SRC_DIR) \
 	-I$(SRC_DIR)/user \
-	-I$(SRC_DIR)/boot
+	-I$(SRC_DIR)/boot \
+	-I$(SRC_DIR)/kernel \
+	-I$(SRC_DIR)/arch/i386/boot \
+	-I$(SRC_DIR)/arch/i386/gdt
 
 LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
 

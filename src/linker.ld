@@ -6,32 +6,32 @@ ENTRY(_start)
 SECTIONS
 {
     # sets start location for kernel
-    . = 2M;
+    . = 1M;
 
     # global kernel start
     _kernel_start = .;
 
     # put multiboot header and text / code section first
-    .text BLOCK(4K) : ALIGN(4K)
+    .text : ALIGN(4K)
     {
-        *(.multiboot)
+        KEEP(*(.multiboot2))
         *(.text)
     }
 
     # read only data
-    .rodata BLOCK(4K) : ALIGN(4K)
+    .rodata : ALIGN(4K)
     {
         *(.rodata)
     }
 
     # read write data 
-    .data BLOCK(4K) : ALIGN(4K)
+    .data : ALIGN(4K)
     {
         *(.data)
     }
 
     # read write data uninitialised and stack
-    .bss BLOCK(4K) : ALIGN(4K)
+    .bss : ALIGN(4K)
     {
         *(COMMON)
         *(.bss)
