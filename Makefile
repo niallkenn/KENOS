@@ -1,17 +1,10 @@
 CC = i386-elf-gcc
-AS = i386-elf-as
 LD = i386-elf-gcc
 
 CC_FLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra \
 	-I$(SRC_DIR) \
-	-I$(SRC_DIR)/sys \
-	-I$(SRC_DIR)/processes \
-	-I$(SRC_DIR)/interrupts \
-	-I$(SRC_DIR)/gdt \
 	-I$(SRC_DIR)/user \
-	-I$(SRC_DIR)/boot \
-	-I$(SRC_DIR)/drivers \
-	-I$(SRC_DIR)/memory
+	-I$(SRC_DIR)/boot
 
 LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
 
@@ -21,10 +14,10 @@ ISO_DIR = iso
 ISO_STAGE_DIR = $(BUILD_DIR)/iso
 
 C_SRCS := $(shell find $(SRC_DIR) -type f -name '*.c')
-S_SRCS := $(shell find $(SRC_DIR) -type f -name '*.s')
+S_SRCS := $(shell find $(SRC_DIR) -type f -name '*.S')
 
 C_OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/c/%.o, $(C_SRCS))
-S_OBJS := $(patsubst $(SRC_DIR)/%.s, $(BUILD_DIR)/s/%.o, $(S_SRCS))
+S_OBJS := $(patsubst $(SRC_DIR)/%.S, $(BUILD_DIR)/S/%.o, $(S_SRCS))
 
 LINKER_SCRIPT = $(SRC_DIR)/linker.ld
 
@@ -48,9 +41,9 @@ $(BUILD_DIR)/c/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
 	@$(CC) $(CC_FLAGS) -c $< -o $@
 
-$(BUILD_DIR)/s/%.o: $(SRC_DIR)/%.s | $(BUILD_DIR)
+$(BUILD_DIR)/S/%.o: $(SRC_DIR)/%.S | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
-	@$(AS) $< -o $@
+	@$(CC) $(CC_FLAGS) -c $< -o $@
 
 $(KENOS): $(C_OBJS) $(S_OBJS)
 	@$(LD) -T $(LINKER_SCRIPT) -o $(KENOS) $(LD_FLAGS) $^
