@@ -24,4 +24,4 @@ extern uint16_t mmap_count;
 
 void init_mmap(uint32_t mmap_addr, uint32_t mmap_length);
 
-#endif  
+#endif
