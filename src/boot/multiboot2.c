@@ -1,5 +1,5 @@
 #include "multiboot2.h"
-#include "stdlib.h"
+#include "user/stdlib.h"
 
 struct mmap_entry mmap_type1_entries[MAX_MMAP_ENTRIES] = {};
 int mmap_type1_count = 0;

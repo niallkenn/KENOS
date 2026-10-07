@@ -1,7 +1,7 @@
 #ifndef MB2_H
 #define MB2_H
 
-#include "definitions.h"
+#include "user/definitions.h"
 
 #define MAX_MMAP_ENTRIES 256
 
