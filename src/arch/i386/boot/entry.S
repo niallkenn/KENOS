@@ -30,12 +30,13 @@ multiboot_start:
     .long 8
 multiboot_end:
 
-# initial kernel stack
+# initial kernel stack, global to be used for inital esp0 in tss
 .section .bss
 .align 16
-stack_bottom:
+.global boot_stack_top
+boot_stack_bottom:
     .skip 16384
-stack_top:
+boot_stack_top:
 
 .section .text
 .global _start
@@ -43,7 +44,7 @@ stack_top:
 
 _start:
     # set stack pointer
-    mov $stack_top, %esp
+    mov $boot_stack_top, %esp
 
     # diable interrupts
     cli
