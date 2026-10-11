@@ -64,8 +64,23 @@ void init_idt(void) {
     load_idt((uint32_t)&idt_ptr);
 }
 
-void interrupt_handler(struct interrupt_frame* frame) {
-    (void*)frame; // do nothing yet
+struct interrupt_frame* interrupt_handler(struct interrupt_frame* frame) {
+    if (frame->vector < 32) {
+        int index = 0;
+        volatile unsigned char* fb = (volatile unsigned char*)0xb8000;
+        const char* message = "ERROR, exception ";
+        for (int i = index; i < strlen(message); i++) {
+            fb[i*2] = message[i];
+            index++;
+        }
+        char vec[2];
+        itoa(frame->vector, vec);
+        for (int i = index; i < index + 2; i++) {
+            fb[i*2] = vec[i - index];
+        }
 
-    return;
+        for (;;) asm volatile("cli; hlt");
+    }
+
+    return frame;
 }

@@ -22,26 +22,33 @@ interrupt_common:
     pushal
 
     # push segment registers, for changing when switching ring
-    pushw %ds
-    pushw %es
-    pushw %fs
-    pushw %gs
+    pushl %ds
+    pushl %es
+    pushl %fs
+    pushl %gs
 
     # must load kernel data selector for C code. now in ring 0
-    movw 0x10, %ax
+    movw $0x10, %ax
     movw %ax, %ds
     movw %ax, %es
     movw %ax, %fs
     movw %ax, %gs
 
+    # now esp points to bottom of interrupt frame, so now have to push esp, the pointer to the frame
+    pushl %esp
+
     call interrupt_handler
 
-    # pop everything in reverse order
-    popw %gs
-    popw %fs
-    popw %es
-    popw %ds
+    # pop the struct pointer pushed
+    addl $4, %esp
 
+    # pop everything in reverse order
+    popl %gs
+    popl %fs
+    popl %es
+    popl %ds
+
+    # pop genreal purpose registers
     popal
 
     # pop the vector and error code, 8 bytes for 2 32bit unsigned integers

@@ -27,8 +27,8 @@ struct __attribute__((packed)) interrupt_frame {
     uint32_t ds;
 
     // general purpose registers, manually pushed
-    uint32_t esi;
     uint32_t edi;
+    uint32_t esi;
     uint32_t ebp;
     uint32_t esp;
     uint32_t ebx;
@@ -58,7 +58,7 @@ extern struct idt_ptr idt_ptr;
 void init_idt(void);
 
 // common interrupt handler c function for isr stubs, takes interrupt frame argument
-void interrupt_handler(struct interrupt_frame* frame);
+struct interrupt_frame* interrupt_handler(struct interrupt_frame* frame);
 
 // asm wrapper for loading idt pointer
 extern void load_idt(uint32_t idt_ptr);
