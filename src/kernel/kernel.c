@@ -4,6 +4,7 @@
 #include "arch/i386/sys/gdt.h"
 #include "arch/i386/sys/tss.h"
 #include "arch/i386/sys/idt.h"
+#include "arch/i386/sys/pic.h"
 
 // main kernel c entry, ring 0
 void kernel_main(uint32_t magic, uint32_t multiboot_info_address) {
@@ -20,6 +21,9 @@ void kernel_main(uint32_t magic, uint32_t multiboot_info_address) {
 
     // init the interrupt descriptor table, loads the idt into the idtr, sets gates for interrupt service routines
     init_idt();
+
+    // remap the pic to allow irqs, remove conflict with certain exception entries in idt
+    init_pic();
 
     // halt cpu, nothing else to do
     for (;;) asm volatile("cli; hlt");
