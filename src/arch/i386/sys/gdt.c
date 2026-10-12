@@ -41,5 +41,6 @@ void init_gdt() {
     gdt_ptr.limit = sizeof(gdt) - 1; // -1 from size of gdt for limit in pointer
     gdt_ptr.base = (uint32_t)&gdt;
 
+    // load global descriptor table
     load_gdt((uint32_t)&gdt_ptr);
 }

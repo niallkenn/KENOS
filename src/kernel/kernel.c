@@ -20,7 +20,7 @@ void kernel_main(uint32_t magic, uint32_t multiboot_info_address) {
 
     // init the interrupt descriptor table, loads the idt into the idtr, sets gates for interrupt service routines
     init_idt();
-    
-    // load global descriptor table
+
+    // halt cpu, nothing else to do
     for (;;) asm volatile("cli; hlt");
 }
