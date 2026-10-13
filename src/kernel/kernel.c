@@ -5,6 +5,9 @@
 #include "arch/i386/sys/tss.h"
 #include "arch/i386/sys/idt.h"
 #include "arch/i386/sys/pic.h"
+#include "arch/i386/sys/interrupts.h"
+#include "arch/i386/sys/io.h"
+#include "arch/i386/sys/pit.h"
 
 // main kernel c entry, ring 0
 void kernel_main(uint32_t magic, uint32_t multiboot_info_address) {
@@ -24,6 +27,20 @@ void kernel_main(uint32_t magic, uint32_t multiboot_info_address) {
 
     // remap the pic to allow irqs, remove conflict with certain exception entries in idt
     init_pic();
+
+    // initialise programmable interval timer, 100 ticks per second, square mode
+    init_pit(100); // 100 tps
+
+    // enable hardware interrupts after setup
+    asm volatile("sti");
+
+    volatile unsigned char* fb = (volatile unsigned char*)0xb8000;
+    uint32_t index = 10;
+
+    while (1) {
+        pit_wait(100);
+        fb[index++ * 2] = '.';
+    }
 
     // halt cpu, nothing else to do
     for (;;) asm volatile("cli; hlt");
