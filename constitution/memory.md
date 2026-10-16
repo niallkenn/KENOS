@@ -1,4 +1,8 @@
 Physical memory: Managed through a physical frame allocator.
+Frame size: 4 KiB, 4096 bytes
+Frame is available if corresponding bit in bitmap is 0, 1 for reserved
+Bitmap will live in kernel maybe some defined physical address? mark it as reserved during setup, not freeable.
+Alloc frame will return NULL if memory is exhausted free frame will just return an error code, success or fail maybe. i acc dont know.
 Page size: 4 KiB.
 Virtual memory: Every process receives its own virtual address space.
 Paging: IA-32 paging initially using non-PAE two-level page tables.
