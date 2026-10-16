@@ -29,7 +29,7 @@ void kernel_main(uint32_t magic, uint32_t multiboot_info_address) {
     init_pic();
 
     // initialise programmable interval timer, 100 ticks per second, square mode
-    init_pit(100); // 100 tps
+    init_pit(PIT_TICKS_PER_SECOND); // 100 tps
 
     // enable hardware interrupts after setup
     asm volatile("sti");
@@ -38,7 +38,7 @@ void kernel_main(uint32_t magic, uint32_t multiboot_info_address) {
     uint32_t index = 10;
 
     while (1) {
-        pit_wait(100);
+        pit_wait_ms(1);
         fb[index++ * 2] = '.';
     }
 

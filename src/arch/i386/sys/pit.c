@@ -15,7 +15,9 @@ void init_pit(uint32_t frequency) {
     outb(0x40, (uint8_t)(divisor >> 8) & 0xFF);
 }
 
-void pit_wait(uint64_t ticks) {
+void pit_wait_ms(uint32_t ms) {
+    // ticks to wait for
+    uint64_t ticks = ms * PIT_TICKS_PER_MS;
     // wait until target
     uint64_t target = timer_ticks + ticks;
 
