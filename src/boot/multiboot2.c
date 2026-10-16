@@ -2,10 +2,13 @@
 #include "user/stdlib.h"
 
 struct mmap_entry mmap_entries[MAX_MMAP_ENTRIES] = {};
-int mmap_entry_count = 0;
+int mmap_entry_count;
 
 void parse_multiboot2(uint32_t multiboot_info_address)
 {
+    // init
+    mmap_entry_count = 0;
+
     // main multiboot info
     struct multiboot2_info_header *mbi = (struct multiboot2_info_header *)(uintptr_t)multiboot_info_address;
 

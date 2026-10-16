@@ -9,35 +9,6 @@
 #include "arch/i386/sys/io.h"
 #include "arch/i386/sys/pit.h"
 
-void print_char(char c, uint32_t index) {
-    volatile unsigned char* fb = (volatile unsigned char*)0xb8000;
-    fb[index * 2] = c;
-}
-
-void print_mmap_entries(void) {
-    volatile unsigned char* fb = (volatile unsigned char*)0xb8000;
-    uint32_t index = 0;
-
-    for (int i = 0; i < mmap_entry_count; i++) {
-        char type[1];
-        itoa(mmap_entries[i].type, type);
-        print_char(type[0], index++);
-        print_char(' ', index++);
-
-
-        char base[20];
-        itoa(mmap_entries[i].base, base);
-        for (int i = 0; i < strlen(base); i++) print_char(base[i], index++);
-        print_char(' ', index++);
-
-        char length[20];
-        itoa(mmap_entries[i].length, length);
-        for (int i = 0; i < strlen(length); i++) print_char(length[i], index++);
-
-        index += 10;
-    }
-}
-
 // main kernel c entry, ring 0
 void kernel_main(uint32_t magic, uint32_t multiboot_info_address) {
     (void)magic;
@@ -63,7 +34,6 @@ void kernel_main(uint32_t magic, uint32_t multiboot_info_address) {
     // enable hardware interrupts after setup
     asm volatile("sti");
 
-    print_mmap_entries();
 
     // halt cpu, nothing else to do
     for (;;) asm volatile("cli; hlt");
