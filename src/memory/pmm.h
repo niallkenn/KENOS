@@ -20,4 +20,8 @@ void init_pmm(void);
 uint32_t frame_allocate(void);
 bool frame_free(uint32_t frame);
 
+// global frame info
+extern uint32_t allocated_frame_count;
+extern uint32_t free_frame_count;
+
 #endif
