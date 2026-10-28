@@ -9,6 +9,7 @@
 #include "arch/i386/sys/io.h"
 #include "arch/i386/sys/pit.h"
 #include "memory/pmm.h"
+#include "arch/i386/mm/paging.h"
 
 // main kernel c entry, ring 0
 void kernel_main(uint32_t magic, uint32_t multiboot_info_address)
@@ -36,6 +37,9 @@ void kernel_main(uint32_t magic, uint32_t multiboot_info_address)
     // initialise physical memory manager, reserving ram regions for physical frame allocation
     init_pmm();
 
+    // initialise page directory, first 16mb identity map, and enable paging
+    if(!init_paging()) for (;;) asm volatile("cli; hlt");
+
     // enable hardware interrupts after setup
     asm volatile("sti");
 
@@ -43,9 +47,7 @@ void kernel_main(uint32_t magic, uint32_t multiboot_info_address)
     volatile unsigned char *fb = (volatile unsigned char *)0xb8000;
     
     // allocation check
-    for (int i = 0; i < 32408; i++) 
-        if (frame_allocate() == 0) asm volatile("ud2");
-
+    
     // log count
     char count[30];
     itoa(free_frame_count, count);
