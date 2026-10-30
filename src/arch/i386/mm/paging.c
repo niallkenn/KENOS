@@ -1,6 +1,8 @@
 #include "paging.h"
 #include "memory/pmm.h"
 
+uint32_t page_directory;
+
 // static function to load page directory into cr3
 static void load_cr3(uint32_t pd_addr) {
     asm volatile(
@@ -38,6 +40,9 @@ bool init_paging(void) {
 
     // check allocation
     if (page_directory_addr == 0) return false;
+
+    // assign to global page directory address
+    page_directory = page_directory_addr;
 
     uint32_t* page_directory_ptr = (uint32_t*)page_directory_addr;
 

@@ -11,6 +11,9 @@
 
 #define PAGE_SIZE 4096
 
+// global page directory address
+extern uint32_t page_directory;
+
 // init paging and enable paging, cr3 and cr0.pg
 bool init_paging(void);
 
